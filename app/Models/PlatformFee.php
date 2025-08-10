@@ -27,11 +27,6 @@ class PlatformFee extends Model
         'paid_at' => 'datetime',
     ];
 
-    public function tenant()
-    {
-        return $this->belongsTo(Tenant::class);
-    }
-
     public function project()
     {
         return $this->belongsTo(Project::class);

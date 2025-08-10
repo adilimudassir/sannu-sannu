@@ -41,11 +41,6 @@ class Project extends Model
         'requires_approval' => 'boolean',
     ];
 
-    public function tenant()
-    {
-        return $this->belongsTo(Tenant::class);
-    }
-
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

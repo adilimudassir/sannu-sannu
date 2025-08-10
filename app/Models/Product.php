@@ -20,11 +20,6 @@ class Product extends Model
         'sort_order',
     ];
 
-    public function tenant()
-    {
-        return $this->belongsTo(Tenant::class);
-    }
-
     public function project()
     {
         return $this->belongsTo(Project::class);

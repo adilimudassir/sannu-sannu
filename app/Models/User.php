@@ -56,11 +56,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function tenant()
-    {
-        return $this->belongsTo(Tenant::class);
-    }
-
     public function createdProjects()
     {
         return $this->hasMany(Project::class, 'created_by');

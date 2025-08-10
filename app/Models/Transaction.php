@@ -28,11 +28,6 @@ class Transaction extends Model
         'processed_at' => 'datetime',
     ];
 
-    public function tenant()
-    {
-        return $this->belongsTo(Tenant::class);
-    }
-
     public function contribution()
     {
         return $this->belongsTo(Contribution::class);

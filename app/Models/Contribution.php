@@ -36,11 +36,6 @@ class Contribution extends Model
         'approved_at' => 'datetime',
     ];
 
-    public function tenant()
-    {
-        return $this->belongsTo(Tenant::class);
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);
