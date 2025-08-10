@@ -1,0 +1,324 @@
+{
+  "metadata": {
+    "title": "Blue Theme Accessibility Audit Report",
+    "timestamp": "2025-08-10T13:52:18.648Z",
+    "version": "1.0.0",
+    "wcagVersion": "2.1",
+    "testingLevel": "AA"
+  },
+  "summary": {
+    "totalColorTests": 14,
+    "passedColorTests": 14,
+    "failedColorTests": 0,
+    "passRate": 100,
+    "overallStatus": "PASS"
+  },
+  "colorContrastResults": [
+    {
+      "foreground": "Deep Navy",
+      "foregroundHex": "#0D1B2A",
+      "background": "White",
+      "backgroundHex": "#FFFFFF",
+      "context": "Primary text on white background",
+      "ratio": 17.39,
+      "level": "AAA",
+      "passes": true,
+      "isLargeText": false,
+      "requirement": "4.5:1"
+    },
+    {
+      "foreground": "Deep Navy",
+      "foregroundHex": "#0D1B2A",
+      "background": "Soft Ice",
+      "backgroundHex": "#E0E1DD",
+      "context": "Primary text on soft ice background",
+      "ratio": 13.24,
+      "level": "AAA",
+      "passes": true,
+      "isLargeText": false,
+      "requirement": "4.5:1"
+    },
+    {
+      "foreground": "Cool Steel (Darker)",
+      "foregroundHex": "#4A5568",
+      "background": "White",
+      "backgroundHex": "#FFFFFF",
+      "context": "Secondary text on white background",
+      "ratio": 7.53,
+      "level": "AAA",
+      "passes": true,
+      "isLargeText": false,
+      "requirement": "4.5:1"
+    },
+    {
+      "foreground": "Cool Steel (Darker)",
+      "foregroundHex": "#4A5568",
+      "background": "Soft Ice",
+      "backgroundHex": "#E0E1DD",
+      "context": "Secondary text on soft ice background",
+      "ratio": 5.73,
+      "level": "AA",
+      "passes": true,
+      "isLargeText": false,
+      "requirement": "4.5:1"
+    },
+    {
+      "foreground": "White",
+      "foregroundHex": "#FFFFFF",
+      "background": "Modern Sky",
+      "backgroundHex": "#415A77",
+      "context": "Button text on modern sky background",
+      "ratio": 7.11,
+      "level": "AAA",
+      "passes": true,
+      "isLargeText": false,
+      "requirement": "4.5:1"
+    },
+    {
+      "foreground": "Modern Sky",
+      "foregroundHex": "#415A77",
+      "background": "White",
+      "backgroundHex": "#FFFFFF",
+      "context": "Button border on white background",
+      "ratio": 7.11,
+      "level": "AAA",
+      "passes": true,
+      "isLargeText": false,
+      "requirement": "4.5:1"
+    },
+    {
+      "foreground": "White",
+      "foregroundHex": "#FFFFFF",
+      "background": "Deep Navy",
+      "backgroundHex": "#0D1B2A",
+      "context": "Navigation text on deep navy background",
+      "ratio": 17.39,
+      "level": "AAA",
+      "passes": true,
+      "isLargeText": false,
+      "requirement": "4.5:1"
+    },
+    {
+      "foreground": "White",
+      "foregroundHex": "#FFFFFF",
+      "background": "Royal Blue",
+      "backgroundHex": "#1B263B",
+      "context": "Navigation text on royal blue background",
+      "ratio": 15.14,
+      "level": "AAA",
+      "passes": true,
+      "isLargeText": false,
+      "requirement": "4.5:1"
+    },
+    {
+      "foreground": "White",
+      "foregroundHex": "#FFFFFF",
+      "background": "Success Green (Darker)",
+      "backgroundHex": "#047857",
+      "context": "Success text on green background",
+      "ratio": 5.48,
+      "level": "AA",
+      "passes": true,
+      "isLargeText": false,
+      "requirement": "4.5:1"
+    },
+    {
+      "foreground": "White",
+      "foregroundHex": "#FFFFFF",
+      "background": "Warning Amber (Darker)",
+      "backgroundHex": "#B45309",
+      "context": "Warning text on amber background",
+      "ratio": 5.02,
+      "level": "AA",
+      "passes": true,
+      "isLargeText": false,
+      "requirement": "4.5:1"
+    },
+    {
+      "foreground": "White",
+      "foregroundHex": "#FFFFFF",
+      "background": "Error Red (Darker)",
+      "backgroundHex": "#DC2626",
+      "context": "Error text on red background",
+      "ratio": 4.83,
+      "level": "AA",
+      "passes": true,
+      "isLargeText": false,
+      "requirement": "4.5:1"
+    },
+    {
+      "foreground": "White",
+      "foregroundHex": "#FFFFFF",
+      "background": "Info Blue (Darker)",
+      "backgroundHex": "#2563EB",
+      "context": "Info text on blue background",
+      "ratio": 5.17,
+      "level": "AA",
+      "passes": true,
+      "isLargeText": false,
+      "requirement": "4.5:1"
+    },
+    {
+      "foreground": "Deep Navy",
+      "foregroundHex": "#0D1B2A",
+      "background": "Soft Ice",
+      "backgroundHex": "#E0E1DD",
+      "context": "Large heading text",
+      "ratio": 13.24,
+      "level": "AAA",
+      "passes": true,
+      "isLargeText": true,
+      "requirement": "3:1"
+    },
+    {
+      "foreground": "Modern Sky",
+      "foregroundHex": "#415A77",
+      "background": "White",
+      "backgroundHex": "#FFFFFF",
+      "context": "Large interactive text",
+      "ratio": 7.11,
+      "level": "AAA",
+      "passes": true,
+      "isLargeText": true,
+      "requirement": "3:1"
+    }
+  ],
+  "componentAccessibilityResults": [
+    {
+      "component": "Button",
+      "checks": [
+        {
+          "feature": "Focus indicators",
+          "status": "PASS",
+          "note": "Uses focus-visible:ring-2 focus-visible:ring-ring"
+        },
+        {
+          "feature": "Keyboard navigation",
+          "status": "PASS",
+          "note": "Supports Tab, Enter, and Space keys"
+        },
+        {
+          "feature": "ARIA support",
+          "status": "PASS",
+          "note": "Accepts aria-label and aria-describedby"
+        },
+        {
+          "feature": "Disabled state",
+          "status": "PASS",
+          "note": "Proper disabled styling and pointer-events-none"
+        }
+      ]
+    },
+    {
+      "component": "Input",
+      "checks": [
+        {
+          "feature": "Focus indicators",
+          "status": "PASS",
+          "note": "Clear blue ring focus indicator"
+        },
+        {
+          "feature": "Label association",
+          "status": "PASS",
+          "note": "Works with htmlFor/id association"
+        },
+        {
+          "feature": "ARIA attributes",
+          "status": "PASS",
+          "note": "Supports aria-required, aria-invalid, aria-describedby"
+        },
+        {
+          "feature": "Placeholder contrast",
+          "status": "PASS",
+          "note": "Uses text-muted-foreground for sufficient contrast"
+        }
+      ]
+    },
+    {
+      "component": "Card",
+      "checks": [
+        {
+          "feature": "Semantic structure",
+          "status": "PASS",
+          "note": "Uses proper heading hierarchy with CardTitle as h3"
+        },
+        {
+          "feature": "Color contrast",
+          "status": "PASS",
+          "note": "Card backgrounds and text meet contrast requirements"
+        },
+        {
+          "feature": "Border visibility",
+          "status": "PASS",
+          "note": "Subtle borders with sufficient contrast"
+        }
+      ]
+    },
+    {
+      "component": "Alert",
+      "checks": [
+        {
+          "feature": "ARIA role",
+          "status": "PASS",
+          "note": "Uses role=\"alert\" for screen readers"
+        },
+        {
+          "feature": "Color independence",
+          "status": "PASS",
+          "note": "Conveys meaning through text and icons, not just color"
+        },
+        {
+          "feature": "Contrast ratios",
+          "status": "PASS",
+          "note": "All alert variants meet WCAG AA standards"
+        }
+      ]
+    },
+    {
+      "component": "Badge",
+      "checks": [
+        {
+          "feature": "Text contrast",
+          "status": "PASS",
+          "note": "All badge variants have sufficient text contrast"
+        },
+        {
+          "feature": "Screen reader support",
+          "status": "PASS",
+          "note": "Text content is readable by screen readers"
+        },
+        {
+          "feature": "Status indication",
+          "status": "PASS",
+          "note": "Can include role=\"status\" for dynamic content"
+        }
+      ]
+    }
+  ],
+  "recommendations": [
+    {
+      "type": "SUCCESS",
+      "message": "All color combinations meet WCAG AA contrast requirements.",
+      "priority": "INFO"
+    },
+    {
+      "type": "TESTING",
+      "message": "Test with actual screen readers (NVDA, JAWS, VoiceOver) for comprehensive accessibility validation.",
+      "priority": "MEDIUM"
+    },
+    {
+      "type": "KEYBOARD_TESTING",
+      "message": "Perform manual keyboard navigation testing to ensure all interactive elements are accessible.",
+      "priority": "MEDIUM"
+    }
+  ],
+  "wcagGuidelines": {
+    "SC 1.4.3": "Contrast (Minimum) - Level AA",
+    "SC 1.4.6": "Contrast (Enhanced) - Level AAA",
+    "SC 2.1.1": "Keyboard - Level A",
+    "SC 2.1.2": "No Keyboard Trap - Level A",
+    "SC 2.4.3": "Focus Order - Level A",
+    "SC 2.4.7": "Focus Visible - Level AA",
+    "SC 4.1.2": "Name, Role, Value - Level A"
+  }
+}

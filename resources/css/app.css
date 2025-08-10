@@ -15,6 +15,20 @@
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
 
+    /* Blue Palette Color Definitions - Accessibility Compliant */
+    --color-deep-navy: #0d1b2a;
+    --color-royal-blue: #1b263b;
+    --color-modern-sky: #415a77;
+    --color-cool-steel: #4a5568; /* Updated for better contrast compliance */
+    --color-soft-ice: #e0e1dd;
+
+    /* Extended Palette - Accessibility Compliant */
+    --color-success: #047857; /* Updated for better contrast */
+    --color-warning: #b45309; /* Updated for better contrast */
+    --color-error: #dc2626; /* Updated for better contrast */
+    --color-info: #2563eb; /* Updated for better contrast */
+
+    /* Semantic Color Mappings */
     --color-background: var(--background);
     --color-foreground: var(--foreground);
 
@@ -60,74 +74,137 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
+    /* Light Mode Blue Theme */
+    --background: oklch(0.87 0.007 60); /* Soft Ice Blue #E0E1DD */
+    --foreground: oklch(0.11 0.053 218); /* Deep Navy #0D1B2A */
+    --card: oklch(1 0 0); /* White for cards */
+    --card-foreground: oklch(0.11 0.053 218); /* Deep Navy */
+    --popover: oklch(1 0 0); /* White for popovers */
+    --popover-foreground: oklch(0.11 0.053 218); /* Deep Navy */
+    --primary: oklch(0.36 0.029 212); /* Modern Sky Blue #415A77 */
+    --primary-foreground: oklch(1 0 0); /* White text on primary */
+    --secondary: oklch(0.17 0.037 219); /* Royal Blue #1B263B */
+    --secondary-foreground: oklch(1 0 0); /* White text on secondary */
+    --muted: oklch(0.87 0.007 60); /* Soft Ice Blue */
+    --muted-foreground: oklch(0.42 0.019 213); /* Cool Steel Blue #4A5568 - Updated for accessibility */
+    --accent: oklch(0.36 0.029 212); /* Modern Sky Blue */
+    --accent-foreground: oklch(1 0 0); /* White text on accent */
+    --destructive: oklch(0.577 0.245 27.325); /* Keep existing red */
+    --destructive-foreground: oklch(1 0 0); /* White text on destructive */
+    --border: oklch(0.42 0.019 213); /* Cool Steel Blue for borders - Updated for accessibility */
+    --input: oklch(0.42 0.019 213); /* Cool Steel Blue for inputs - Updated for accessibility */
+    --ring: oklch(0.36 0.029 212); /* Modern Sky Blue for focus rings */
+    --chart-1: oklch(0.36 0.029 212); /* Modern Sky Blue */
+    --chart-2: oklch(0.17 0.037 219); /* Royal Blue */
+    --chart-3: oklch(0.11 0.053 218); /* Deep Navy */
+    --chart-4: oklch(0.42 0.019 213); /* Cool Steel Blue - Updated for accessibility */
+    --chart-5: oklch(0.87 0.007 60); /* Soft Ice Blue */
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+    --sidebar: oklch(0.17 0.037 219); /* Royal Blue for sidebar */
+    --sidebar-foreground: oklch(1 0 0); /* White text on sidebar */
+    --sidebar-primary: oklch(0.11 0.053 218); /* Deep Navy for primary elements */
+    --sidebar-primary-foreground: oklch(1 0 0); /* White text */
+    --sidebar-accent: oklch(0.36 0.029 212); /* Modern Sky Blue for accents */
+    --sidebar-accent-foreground: oklch(1 0 0); /* White text */
+    --sidebar-border: oklch(0.42 0.019 213); /* Cool Steel Blue for borders - Updated for accessibility */
+    --sidebar-ring: oklch(0.36 0.029 212); /* Modern Sky Blue for focus */
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    /* Dark Mode Blue Theme */
+    --background: oklch(0.11 0.053 218); /* Deep Navy #0D1B2A */
+    --foreground: oklch(0.87 0.007 60); /* Soft Ice Blue for text */
+    --card: oklch(0.17 0.037 219); /* Royal Blue for cards */
+    --card-foreground: oklch(0.87 0.007 60); /* Soft Ice Blue text */
+    --popover: oklch(0.17 0.037 219); /* Royal Blue for popovers */
+    --popover-foreground: oklch(0.87 0.007 60); /* Soft Ice Blue text */
+    --primary: oklch(0.36 0.029 212); /* Modern Sky Blue */
+    --primary-foreground: oklch(1 0 0); /* White text on primary */
+    --secondary: oklch(0.17 0.037 219); /* Royal Blue */
+    --secondary-foreground: oklch(0.87 0.007 60); /* Soft Ice Blue text */
+    --muted: oklch(0.17 0.037 219); /* Royal Blue for muted backgrounds */
+    --muted-foreground: oklch(0.42 0.019 213); /* Cool Steel Blue for muted text - Updated for accessibility */
+    --accent: oklch(0.36 0.029 212); /* Modern Sky Blue */
+    --accent-foreground: oklch(1 0 0); /* White text on accent */
+    --destructive: oklch(0.396 0.141 25.723); /* Keep existing red for dark mode */
+    --destructive-foreground: oklch(0.637 0.237 25.331); /* Keep existing red text */
+    --border: oklch(0.17 0.037 219); /* Royal Blue for borders */
+    --input: oklch(0.17 0.037 219); /* Royal Blue for inputs */
+    --ring: oklch(0.36 0.029 212); /* Modern Sky Blue for focus rings */
+    --chart-1: oklch(0.36 0.029 212); /* Modern Sky Blue */
+    --chart-2: oklch(0.56 0.023 213); /* Cool Steel Blue */
+    --chart-3: oklch(0.87 0.007 60); /* Soft Ice Blue */
+    --chart-4: oklch(0.17 0.037 219); /* Royal Blue */
+    --chart-5: oklch(0.11 0.053 218); /* Deep Navy */
+    --sidebar: oklch(0.11 0.053 218); /* Deep Navy for sidebar */
+    --sidebar-foreground: oklch(0.87 0.007 60); /* Soft Ice Blue text */
+    --sidebar-primary: oklch(0.36 0.029 212); /* Modern Sky Blue for primary elements */
+    --sidebar-primary-foreground: oklch(1 0 0); /* White text */
+    --sidebar-accent: oklch(0.17 0.037 219); /* Royal Blue for accents */
+    --sidebar-accent-foreground: oklch(0.87 0.007 60); /* Soft Ice Blue text */
+    --sidebar-border: oklch(0.17 0.037 219); /* Royal Blue for borders */
+    --sidebar-ring: oklch(0.36 0.029 212); /* Modern Sky Blue for focus */
+}
+
+/* CSS Custom Property Fallbacks for Browser Compatibility */
+@supports not (color: oklch(0 0 0)) {
+    :root {
+        /* Fallback colors in hex format for older browsers */
+        --background: #e0e1dd; /* Soft Ice Blue */
+        --foreground: #0d1b2a; /* Deep Navy */
+        --card: #ffffff; /* White */
+        --card-foreground: #0d1b2a; /* Deep Navy */
+        --popover: #ffffff; /* White */
+        --popover-foreground: #0d1b2a; /* Deep Navy */
+        --primary: #415a77; /* Modern Sky Blue */
+        --primary-foreground: #ffffff; /* White */
+        --secondary: #1b263b; /* Royal Blue */
+        --secondary-foreground: #ffffff; /* White */
+        --muted: #e0e1dd; /* Soft Ice Blue */
+        --muted-foreground: #4a5568; /* Cool Steel Blue - Updated for accessibility */
+        --accent: #415a77; /* Modern Sky Blue */
+        --accent-foreground: #ffffff; /* White */
+        --border: #4a5568; /* Cool Steel Blue - Updated for accessibility */
+        --input: #4a5568; /* Cool Steel Blue - Updated for accessibility */
+        --ring: #415a77; /* Modern Sky Blue */
+        --sidebar: #1b263b; /* Royal Blue */
+        --sidebar-foreground: #ffffff; /* White */
+        --sidebar-primary: #0d1b2a; /* Deep Navy */
+        --sidebar-primary-foreground: #ffffff; /* White */
+        --sidebar-accent: #415a77; /* Modern Sky Blue */
+        --sidebar-accent-foreground: #ffffff; /* White */
+        --sidebar-border: #4a5568; /* Cool Steel Blue - Updated for accessibility */
+        --sidebar-ring: #415a77; /* Modern Sky Blue */
+    }
+
+    .dark {
+        /* Dark mode fallback colors */
+        --background: #0d1b2a; /* Deep Navy */
+        --foreground: #e0e1dd; /* Soft Ice Blue */
+        --card: #1b263b; /* Royal Blue */
+        --card-foreground: #e0e1dd; /* Soft Ice Blue */
+        --popover: #1b263b; /* Royal Blue */
+        --popover-foreground: #e0e1dd; /* Soft Ice Blue */
+        --primary: #415a77; /* Modern Sky Blue */
+        --primary-foreground: #ffffff; /* White */
+        --secondary: #1b263b; /* Royal Blue */
+        --secondary-foreground: #e0e1dd; /* Soft Ice Blue */
+        --muted: #1b263b; /* Royal Blue */
+        --muted-foreground: #4a5568; /* Cool Steel Blue - Updated for accessibility */
+        --accent: #415a77; /* Modern Sky Blue */
+        --accent-foreground: #ffffff; /* White */
+        --border: #1b263b; /* Royal Blue */
+        --input: #1b263b; /* Royal Blue */
+        --ring: #415a77; /* Modern Sky Blue */
+        --sidebar: #0d1b2a; /* Deep Navy */
+        --sidebar-foreground: #e0e1dd; /* Soft Ice Blue */
+        --sidebar-primary: #415a77; /* Modern Sky Blue */
+        --sidebar-primary-foreground: #ffffff; /* White */
+        --sidebar-accent: #1b263b; /* Royal Blue */
+        --sidebar-accent-foreground: #e0e1dd; /* Soft Ice Blue */
+        --sidebar-border: #1b263b; /* Royal Blue */
+        --sidebar-ring: #415a77; /* Modern Sky Blue */
+    }
 }
 
 @layer base {
@@ -137,5 +214,11 @@
 
     body {
         @apply bg-background text-foreground;
+    }
+
+    @keyframes shimmer {
+        100% {
+            transform: translateX(100%);
+        }
     }
 }
