@@ -55,6 +55,8 @@ class AuditLogService
             'all_sessions_invalidated' => Log::info('Session: All user sessions invalidated', $logData),
             'tenant_context_set' => Log::info('Session: Tenant context set', $logData),
             'tenant_context_cleared' => Log::info('Session: Tenant context cleared', $logData),
+            'email_verification_requested' => Log::info('Authentication: Email verification requested', $logData),
+            'email_verified' => Log::info('Authentication: Email verified successfully', $logData),
             'suspicious_activity' => Log::warning('Security: Suspicious activity detected', $logData),
             'role_changed' => Log::info('Authorization: User role changed', $logData),
             'permission_denied' => Log::warning('Authorization: Permission denied', $logData),
@@ -158,5 +160,72 @@ class AuditLogService
                 'requires_investigation' => true,
             ]
         );
+    }
+
+    /**
+     * Log profile update events.
+     */
+    public function logProfileUpdate(
+        User $user,
+        array $originalData,
+        array $changes,
+        ?string $ipAddress = null
+    ): void {
+        $logData = [
+            'event' => 'profile_updated',
+            'user_id' => $user->id,
+            'user_email' => $user->email,
+            'timestamp' => now()->toISOString(),
+            'ip_address' => $ipAddress,
+            'original_data' => $originalData,
+            'changes' => $changes,
+            'changed_fields' => array_keys($changes),
+        ];
+
+        Log::info('Profile: User profile updated', $logData);
+    }
+
+    /**
+     * Log email change events specifically.
+     */
+    public function logEmailChange(
+        User $user,
+        string $oldEmail,
+        string $newEmail,
+        ?string $ipAddress = null
+    ): void {
+        $logData = [
+            'event' => 'email_changed',
+            'user_id' => $user->id,
+            'timestamp' => now()->toISOString(),
+            'ip_address' => $ipAddress,
+            'old_email' => $oldEmail,
+            'new_email' => $newEmail,
+            'verification_required' => true,
+        ];
+
+        Log::info('Profile: User email address changed', $logData);
+    }
+
+    /**
+     * Log account deletion events.
+     */
+    public function logAccountDeletion(
+        User $user,
+        ?string $ipAddress = null,
+        string $reason = 'User requested'
+    ): void {
+        $logData = [
+            'event' => 'account_deleted',
+            'user_id' => $user->id,
+            'user_email' => $user->email,
+            'user_name' => $user->name,
+            'timestamp' => now()->toISOString(),
+            'ip_address' => $ipAddress,
+            'reason' => $reason,
+            'soft_delete' => true,
+        ];
+
+        Log::warning('Profile: User account deleted', $logData);
     }
 }

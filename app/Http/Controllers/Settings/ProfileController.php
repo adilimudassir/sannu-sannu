@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Services\AuditLogService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,6 +14,10 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
+    public function __construct(
+        private AuditLogService $auditLogService
+    ) {}
+
     /**
      * Show the user's profile settings page.
      */
@@ -29,15 +34,34 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $originalData = $user->only(['name', 'email']);
+        
+        $user->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $emailChanged = false;
+        if ($user->isDirty('email')) {
+            $emailChanged = true;
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $changes = $user->getDirty();
+        $user->save();
 
-        return to_route('profile.edit');
+        // Log profile changes for audit purposes
+        if (!empty($changes)) {
+            $this->auditLogService->logProfileUpdate($user, $originalData, $changes, $request->ip());
+            
+            if ($emailChanged) {
+                $this->auditLogService->logEmailChange($user, $originalData['email'], $changes['email'], $request->ip());
+            }
+        }
+
+        $message = $emailChanged 
+            ? 'Profile updated successfully. Please verify your new email address.'
+            : 'Profile updated successfully.';
+
+        return redirect('/settings/profile')->with('status', $message);
     }
 
     /**
@@ -51,6 +75,9 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        // Log account deletion for audit purposes
+        $this->auditLogService->logAccountDeletion($user, $request->ip(), 'User requested account deletion');
+
         Auth::logout();
 
         $user->delete();
@@ -58,6 +85,6 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/')->with('status', 'Your account has been successfully deleted.');
     }
 }

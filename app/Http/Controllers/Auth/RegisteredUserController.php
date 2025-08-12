@@ -48,7 +48,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        // Redirect to global dashboard for contributors
-        return redirect()->route('global.dashboard');
+        // Redirect to email verification page since new users need to verify their email
+        return redirect()->route('verification.notice');
     }
 }

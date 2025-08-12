@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant' => \App\Http\Middleware\IdentifyTenant::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'session.activity' => \App\Http\Middleware\SessionActivityMiddleware::class,
+            'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
