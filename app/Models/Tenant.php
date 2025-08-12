@@ -35,9 +35,23 @@ class Tenant extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * Users with roles in this tenant (many-to-many through pivot)
+     */
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class, 'user_tenant_roles')
+            ->withPivot('role', 'is_active')
+            ->withTimestamps()
+            ->wherePivot('is_active', true);
+    }
+
+    /**
+     * User tenant roles for this tenant
+     */
+    public function userTenantRoles()
+    {
+        return $this->hasMany(UserTenantRole::class);
     }
 
     public function projects()

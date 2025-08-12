@@ -13,28 +13,48 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
-            'tenant_id' => 1,
+        // Create global users (contributors by default)
+        $adil = User::create([
             'name' => 'Adil Imudassir',
             'email' => 'adil.imudassir@sannu-sannu.com',
             'password' => Hash::make('password'),
-            'role' => 'tenant_admin',
+            'role' => 'contributor', // Global role
         ]);
 
-        User::create([
-            'tenant_id' => 2,
+        $john = User::create([
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'password' => Hash::make('password'),
-            'role' => 'tenant_admin',
+            'role' => 'contributor', // Global role
         ]);
 
-        User::create([
-            'tenant_id' => 2,
+        $jane = User::create([
             'name' => 'Jane Doe',
             'email' => 'jane.doe@example.com',
             'password' => Hash::make('password'),
+            'role' => 'contributor', // Global role
+        ]);
+
+        // Assign tenant-specific roles
+        // Adil is tenant admin for tenant 1
+        $adil->tenantRoles()->create([
+            'tenant_id' => 1,
+            'role' => 'tenant_admin',
+            'is_active' => true,
+        ]);
+
+        // John is tenant admin for tenant 2
+        $john->tenantRoles()->create([
+            'tenant_id' => 2,
+            'role' => 'tenant_admin',
+            'is_active' => true,
+        ]);
+
+        // Jane is project manager for tenant 2
+        $jane->tenantRoles()->create([
+            'tenant_id' => 2,
             'role' => 'project_manager',
+            'is_active' => true,
         ]);
     }
 }

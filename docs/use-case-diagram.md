@@ -4,9 +4,10 @@
 ### System Actors
 
 #### Primary Actors
-1. **User (Contributor)** - End users who participate in projects and make contributions
-2. **Admin** - System administrators who manage projects and oversee platform operations
-3. **Guest** - Unregistered visitors who can view public information
+1. **User (Contributor)** - End users who participate in projects and make contributions across all tenants
+2. **Tenant Admin** - Administrators who manage projects and users within specific tenant organizations
+3. **System Admin** - Platform administrators who manage the entire system and all tenants
+4. **Guest** - Unregistered visitors who can view public information
 
 #### Secondary Actors
 1. **Paystack System** - External payment processing service
@@ -19,7 +20,8 @@
 graph TB
     %% Actors
     User[👤 User<br/>Contributor]
-    Admin[👨‍💼 Admin]
+    TenantAdmin[👨‍💼 Tenant<br/>Admin]
+    SystemAdmin[👨‍💻 System<br/>Admin]
     Guest[👥 Guest]
     Paystack[💳 Paystack<br/>System]
     EmailSys[📧 Email<br/>System]
@@ -30,14 +32,16 @@ graph TB
         %% Authentication Use Cases
         UC1[Register Account]
         UC2[Login to System]
-        UC3[Logout from System]
-        UC4[Reset Password]
-        UC5[Update Profile]
+        UC3[Select Tenant]
+        UC4[Switch Tenant]
+        UC5[Logout from System]
+        UC6[Reset Password]
+        UC7[Update Profile]
 
         %% Project Discovery Use Cases
-        UC6[Browse Projects]
-        UC7[View Project Details]
-        UC8[Search Projects]
+        UC8[Browse All Public Projects]
+        UC9[View Project Details]
+        UC10[Search Cross-Tenant Projects]
 
         %% Project Participation Use Cases
         UC9[Join Project]
@@ -160,15 +164,38 @@ graph TB
 **Postconditions**: User account is created and verified
 
 ##### UC2: Login to System
-**Actor**: User, Admin
-**Description**: Registered users authenticate to access platform features
+**Actor**: User, Tenant Admin, System Admin
+**Description**: Registered users authenticate globally to access platform features
 **Preconditions**: User has valid account credentials
 **Main Flow**:
-1. User provides email and password
-2. System validates credentials
-3. System creates user session
-4. System redirects to appropriate dashboard
-**Postconditions**: User is authenticated and logged in
+1. User accesses global login page (/login)
+2. User provides email and password
+3. System validates credentials globally
+4. System determines user role and access patterns
+5. System redirects based on role:
+   - Contributors → Global dashboard
+   - Admin users → Tenant selection
+   - System admins → System dashboard
+**Postconditions**: User is authenticated and redirected to appropriate interface
+
+**Alternative Flow - Admin Tenant Selection**:
+4a. User has tenant admin/manager roles
+4b. System redirects to tenant selection page
+4c. User selects which tenant to manage
+4d. System stores tenant context in session
+4e. System redirects to tenant-specific dashboard
+
+##### UC3: Select Tenant
+**Actor**: Tenant Admin
+**Description**: Admin users select which tenant organization to manage
+**Preconditions**: User is authenticated and has roles in multiple tenants
+**Main Flow**:
+1. System displays available tenants for user
+2. User selects desired tenant to manage
+3. System validates user access to selected tenant
+4. System stores tenant context in session
+5. System redirects to tenant-specific dashboard
+**Postconditions**: User is operating within selected tenant context
 
 ##### UC5: Update Profile
 **Actor**: User, Admin
@@ -184,16 +211,17 @@ graph TB
 
 #### Project Discovery & Participation
 
-##### UC6: Browse Projects
+##### UC8: Browse All Public Projects
 **Actor**: User, Guest
-**Description**: Users can view available projects
+**Description**: Users can view public projects from all tenant organizations
 **Preconditions**: None
 **Main Flow**:
-1. User accesses projects page
-2. System displays active projects
-3. User can filter and sort projects
-4. System shows project summaries
-**Postconditions**: User sees available projects
+1. User accesses global projects dashboard
+2. System displays active public projects from all tenants
+3. User can filter and sort projects by tenant, category, etc.
+4. System shows project summaries with tenant information
+5. User can see cross-tenant project opportunities
+**Postconditions**: User sees available projects across all organizations
 
 ##### UC9: Join Project
 **Actor**: User

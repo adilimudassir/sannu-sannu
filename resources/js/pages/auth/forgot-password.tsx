@@ -1,63 +1,107 @@
-// Components
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { Head } from '@inertiajs/react';
 
-import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
+import { AuthCard } from '@/components/auth/auth-card';
+import { AuthForm, AuthFormField } from '@/components/auth/auth-form';
+import { AuthInput } from '@/components/auth/auth-input';
+import { AuthButton } from '@/components/auth/auth-button';
 
-export default function ForgotPassword({ status }: { status?: string }) {
-    const { data, setData, post, processing, errors } = useForm<Required<{ email: string }>>({
-        email: '',
-    });
+type ForgotPasswordForm = {
+    email: string;
+};
 
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
+interface ForgotPasswordProps {
+    status?: string;
+}
 
-        post(route('password.email'));
+export default function ForgotPassword({ status }: ForgotPasswordProps) {
+    const handleSubmit = (data: ForgotPasswordForm, form: any) => {
+        form.post(route('global.password.email'));
     };
 
     return (
-        <AuthLayout title="Forgot password" description="Enter your email to receive a password reset link">
+        <>
             <Head title="Forgot password" />
-
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
-
-            <div className="space-y-6">
-                <form onSubmit={submit}>
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            name="email"
-                            autoComplete="off"
-                            value={data.email}
-                            autoFocus
-                            onChange={(e) => setData('email', e.target.value)}
-                            placeholder="email@example.com"
-                        />
-
-                        <InputError message={errors.email} />
+            <AuthCard 
+                title="Forgot password" 
+                description="Enter your email address and we'll send you a password reset link"
+            >
+                {/* Status message */}
+                {status && (
+                    <div 
+                        className="mb-4 text-center text-sm font-medium text-green-600"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        {status}
                     </div>
+                )}
 
-                    <div className="my-6 flex items-center justify-start">
-                        <Button className="w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                            Email password reset link
-                        </Button>
-                    </div>
-                </form>
+                <AuthForm
+                    initialData={{
+                        email: '',
+                    }}
+                    onSubmit={handleSubmit}
+                >
+                    {(form) => (
+                        <>
+                            <div className="space-y-4">
+                                <AuthFormField
+                                    label="Email address"
+                                    name="email"
+                                    error={form.errors.email}
+                                    required
+                                >
+                                    <AuthInput
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        required
+                                        autoFocus
+                                        tabIndex={1}
+                                        autoComplete="email"
+                                        value={form.data.email}
+                                        onChange={(e) => form.setData('email', e.target.value)}
+                                        placeholder="email@example.com"
+                                        error={!!form.errors.email}
+                                        aria-describedby={form.errors.email ? "email-error" : undefined}
+                                    />
+                                </AuthFormField>
+                            </div>
 
-                <div className="space-x-1 text-center text-sm text-muted-foreground">
-                    <span>Or, return to</span>
-                    <TextLink href={route('login')}>log in</TextLink>
-                </div>
-            </div>
-        </AuthLayout>
+                            <AuthButton
+                                type="submit"
+                                className="w-full"
+                                tabIndex={2}
+                                loading={form.processing}
+                                loadingText="Sending reset link..."
+                                aria-describedby={form.hasErrors ? "form-errors" : undefined}
+                            >
+                                Email password reset link
+                            </AuthButton>
+
+                            {/* General form errors */}
+                            {form.hasErrors && (
+                                <div 
+                                    id="form-errors" 
+                                    className="text-center text-sm text-destructive"
+                                    role="alert"
+                                    aria-live="assertive"
+                                >
+                                    Please correct the errors above and try again.
+                                </div>
+                            )}
+
+                            <div className="text-center text-sm text-muted-foreground">
+                                Remember your password?{' '}
+                                <TextLink href={route('global.login')} tabIndex={3}>
+                                    Back to log in
+                                </TextLink>
+                            </div>
+                        </>
+                    )}
+                </AuthForm>
+            </AuthCard>
+        </>
     );
 }

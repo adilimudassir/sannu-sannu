@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\AuditLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,8 +20,8 @@ class AuthenticatedSessionController extends Controller
     public function create(Request $request): Response
     {
         return Inertia::render('auth/login', [
-            'canResetPassword' => Route::has('password.request'),
-            'status' => $request->session()->get('status'),
+            'canResetPassword' => Route::has('global.password.request'),
+            'status' => session('status'),
         ]);
     }
 
@@ -33,7 +34,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = $request->user();
+
+        // Role-based redirect logic
+        if ($user->isSystemAdmin()) {
+            // System admins go to system dashboard
+            return redirect()->intended(route('admin.dashboard'));
+        } elseif ($user->needsTenantSelection()) {
+            // Users with tenant admin/project manager roles need to select tenant
+            return redirect()->intended(route('tenant.select'));
+        } else {
+            // Contributors go to global dashboard
+            return redirect()->intended(route('global.dashboard'));
+        }
     }
 
     /**
@@ -41,6 +54,13 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = $request->user();
+
+        // Log logout event before destroying session
+        if ($user) {
+            AuditLogService::logAuthEvent('logout', $user, $request);
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

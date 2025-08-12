@@ -20,7 +20,7 @@
     --color-royal-blue: #1b263b;
     --color-modern-sky: #415a77;
     --color-cool-steel: #4a5568; /* Updated for better contrast compliance */
-    --color-soft-ice: #e0e1dd;
+    --color-soft-ice: #e8e8e3;
 
     /* Extended Palette - Accessibility Compliant */
     --color-success: #047857; /* Updated for better contrast */
@@ -75,7 +75,7 @@
 
 :root {
     /* Light Mode Blue Theme */
-    --background: oklch(0.87 0.007 60); /* Soft Ice Blue #E0E1DD */
+    --background: oklch(0.966 0.003 85); /* Soft Ice Blue #e8e8e3 */
     --foreground: oklch(0.11 0.053 218); /* Deep Navy #0D1B2A */
     --card: oklch(1 0 0); /* White for cards */
     --card-foreground: oklch(0.11 0.053 218); /* Deep Navy */
@@ -85,7 +85,7 @@
     --primary-foreground: oklch(1 0 0); /* White text on primary */
     --secondary: oklch(0.17 0.037 219); /* Royal Blue #1B263B */
     --secondary-foreground: oklch(1 0 0); /* White text on secondary */
-    --muted: oklch(0.87 0.007 60); /* Soft Ice Blue */
+    --muted: oklch(0.966 0.003 85); /* Soft Ice Blue */
     --muted-foreground: oklch(0.42 0.019 213); /* Cool Steel Blue #4A5568 - Updated for accessibility */
     --accent: oklch(0.36 0.029 212); /* Modern Sky Blue */
     --accent-foreground: oklch(1 0 0); /* White text on accent */
@@ -98,7 +98,7 @@
     --chart-2: oklch(0.17 0.037 219); /* Royal Blue */
     --chart-3: oklch(0.11 0.053 218); /* Deep Navy */
     --chart-4: oklch(0.42 0.019 213); /* Cool Steel Blue - Updated for accessibility */
-    --chart-5: oklch(0.87 0.007 60); /* Soft Ice Blue */
+    --chart-5: oklch(0.966 0.003 85); /* Soft Ice Blue */
     --radius: 0.625rem;
     --sidebar: oklch(0.17 0.037 219); /* Royal Blue for sidebar */
     --sidebar-foreground: oklch(1 0 0); /* White text on sidebar */
@@ -113,15 +113,15 @@
 .dark {
     /* Dark Mode Blue Theme */
     --background: oklch(0.11 0.053 218); /* Deep Navy #0D1B2A */
-    --foreground: oklch(0.87 0.007 60); /* Soft Ice Blue for text */
+    --foreground: oklch(0.966 0.003 85); /* Soft Ice Blue for text */
     --card: oklch(0.17 0.037 219); /* Royal Blue for cards */
-    --card-foreground: oklch(0.87 0.007 60); /* Soft Ice Blue text */
+    --card-foreground: oklch(0.966 0.003 85); /* Soft Ice Blue text */
     --popover: oklch(0.17 0.037 219); /* Royal Blue for popovers */
-    --popover-foreground: oklch(0.87 0.007 60); /* Soft Ice Blue text */
+    --popover-foreground: oklch(0.966 0.003 85); /* Soft Ice Blue text */
     --primary: oklch(0.36 0.029 212); /* Modern Sky Blue */
     --primary-foreground: oklch(1 0 0); /* White text on primary */
     --secondary: oklch(0.17 0.037 219); /* Royal Blue */
-    --secondary-foreground: oklch(0.87 0.007 60); /* Soft Ice Blue text */
+    --secondary-foreground: oklch(0.966 0.003 85); /* Soft Ice Blue text */
     --muted: oklch(0.17 0.037 219); /* Royal Blue for muted backgrounds */
     --muted-foreground: oklch(0.42 0.019 213); /* Cool Steel Blue for muted text - Updated for accessibility */
     --accent: oklch(0.36 0.029 212); /* Modern Sky Blue */
@@ -133,15 +133,15 @@
     --ring: oklch(0.36 0.029 212); /* Modern Sky Blue for focus rings */
     --chart-1: oklch(0.36 0.029 212); /* Modern Sky Blue */
     --chart-2: oklch(0.56 0.023 213); /* Cool Steel Blue */
-    --chart-3: oklch(0.87 0.007 60); /* Soft Ice Blue */
+    --chart-3: oklch(0.966 0.003 85); /* Soft Ice Blue */
     --chart-4: oklch(0.17 0.037 219); /* Royal Blue */
     --chart-5: oklch(0.11 0.053 218); /* Deep Navy */
     --sidebar: oklch(0.11 0.053 218); /* Deep Navy for sidebar */
-    --sidebar-foreground: oklch(0.87 0.007 60); /* Soft Ice Blue text */
+    --sidebar-foreground: oklch(0.966 0.003 85); /* Soft Ice Blue text */
     --sidebar-primary: oklch(0.36 0.029 212); /* Modern Sky Blue for primary elements */
     --sidebar-primary-foreground: oklch(1 0 0); /* White text */
     --sidebar-accent: oklch(0.17 0.037 219); /* Royal Blue for accents */
-    --sidebar-accent-foreground: oklch(0.87 0.007 60); /* Soft Ice Blue text */
+    --sidebar-accent-foreground: oklch(0.966 0.003 85); /* Soft Ice Blue text */
     --sidebar-border: oklch(0.17 0.037 219); /* Royal Blue for borders */
     --sidebar-ring: oklch(0.36 0.029 212); /* Modern Sky Blue for focus */
 }
@@ -150,7 +150,7 @@
 @supports not (color: oklch(0 0 0)) {
     :root {
         /* Fallback colors in hex format for older browsers */
-        --background: #e0e1dd; /* Soft Ice Blue */
+        --background: #e8e8e3; /* Soft Ice Blue */
         --foreground: #0d1b2a; /* Deep Navy */
         --card: #ffffff; /* White */
         --card-foreground: #0d1b2a; /* Deep Navy */
@@ -160,7 +160,7 @@
         --primary-foreground: #ffffff; /* White */
         --secondary: #1b263b; /* Royal Blue */
         --secondary-foreground: #ffffff; /* White */
-        --muted: #e0e1dd; /* Soft Ice Blue */
+        --muted: #e8e8e3; /* Soft Ice Blue */
         --muted-foreground: #4a5568; /* Cool Steel Blue - Updated for accessibility */
         --accent: #415a77; /* Modern Sky Blue */
         --accent-foreground: #ffffff; /* White */
@@ -180,15 +180,15 @@
     .dark {
         /* Dark mode fallback colors */
         --background: #0d1b2a; /* Deep Navy */
-        --foreground: #e0e1dd; /* Soft Ice Blue */
+        --foreground: #e8e8e3; /* Soft Ice Blue */
         --card: #1b263b; /* Royal Blue */
-        --card-foreground: #e0e1dd; /* Soft Ice Blue */
+        --card-foreground: #e8e8e3; /* Soft Ice Blue */
         --popover: #1b263b; /* Royal Blue */
-        --popover-foreground: #e0e1dd; /* Soft Ice Blue */
+        --popover-foreground: #e8e8e3; /* Soft Ice Blue */
         --primary: #415a77; /* Modern Sky Blue */
         --primary-foreground: #ffffff; /* White */
         --secondary: #1b263b; /* Royal Blue */
-        --secondary-foreground: #e0e1dd; /* Soft Ice Blue */
+        --secondary-foreground: #e8e8e3; /* Soft Ice Blue */
         --muted: #1b263b; /* Royal Blue */
         --muted-foreground: #4a5568; /* Cool Steel Blue - Updated for accessibility */
         --accent: #415a77; /* Modern Sky Blue */
@@ -197,11 +197,11 @@
         --input: #1b263b; /* Royal Blue */
         --ring: #415a77; /* Modern Sky Blue */
         --sidebar: #0d1b2a; /* Deep Navy */
-        --sidebar-foreground: #e0e1dd; /* Soft Ice Blue */
+        --sidebar-foreground: #e8e8e3; /* Soft Ice Blue */
         --sidebar-primary: #415a77; /* Modern Sky Blue */
         --sidebar-primary-foreground: #ffffff; /* White */
         --sidebar-accent: #1b263b; /* Royal Blue */
-        --sidebar-accent-foreground: #e0e1dd; /* Soft Ice Blue */
+        --sidebar-accent-foreground: #e8e8e3; /* Soft Ice Blue */
         --sidebar-border: #1b263b; /* Royal Blue */
         --sidebar-ring: #415a77; /* Modern Sky Blue */
     }

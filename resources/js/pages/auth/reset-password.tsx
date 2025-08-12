@@ -1,12 +1,9 @@
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { Head } from '@inertiajs/react';
 
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
+import { AuthCard } from '@/components/auth/auth-card';
+import { AuthForm, AuthFormField } from '@/components/auth/auth-form';
+import { AuthInput } from '@/components/auth/auth-input';
+import { AuthButton } from '@/components/auth/auth-button';
 
 interface ResetPasswordProps {
     token: string;
@@ -21,78 +18,121 @@ type ResetPasswordForm = {
 };
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<Required<ResetPasswordForm>>({
-        token: token,
-        email: email,
-        password: '',
-        password_confirmation: '',
-    });
-
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
-        post(route('password.store'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+    const handleSubmit = (data: ResetPasswordForm, form: any) => {
+        form.post(route('global.password.store'), {
+            onFinish: () => form.reset('password', 'password_confirmation'),
         });
     };
 
     return (
-        <AuthLayout title="Reset password" description="Please enter your new password below">
+        <>
             <Head title="Reset password" />
+            <AuthCard 
+                title="Reset password" 
+                description="Please enter your new password below"
+            >
+                <AuthForm
+                    initialData={{
+                        token: token,
+                        email: email,
+                        password: '',
+                        password_confirmation: '',
+                    }}
+                    onSubmit={handleSubmit}
+                >
+                    {(form) => (
+                        <>
+                            <div className="space-y-4">
+                                <AuthFormField
+                                    label="Email address"
+                                    name="email"
+                                    error={form.errors.email}
+                                >
+                                    <AuthInput
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        tabIndex={1}
+                                        autoComplete="email"
+                                        value={form.data.email}
+                                        onChange={(e) => form.setData('email', e.target.value)}
+                                        readOnly
+                                        className="bg-muted"
+                                        error={!!form.errors.email}
+                                        aria-describedby={form.errors.email ? "email-error" : undefined}
+                                    />
+                                </AuthFormField>
 
-            <form onSubmit={submit}>
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            name="email"
-                            autoComplete="email"
-                            value={data.email}
-                            className="mt-1 block w-full"
-                            readOnly
-                            onChange={(e) => setData('email', e.target.value)}
-                        />
-                        <InputError message={errors.email} className="mt-2" />
-                    </div>
+                                <AuthFormField
+                                    label="New password"
+                                    name="password"
+                                    error={form.errors.password}
+                                    required
+                                >
+                                    <AuthInput
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        required
+                                        autoFocus
+                                        tabIndex={2}
+                                        autoComplete="new-password"
+                                        value={form.data.password}
+                                        onChange={(e) => form.setData('password', e.target.value)}
+                                        placeholder="Enter your new password"
+                                        error={!!form.errors.password}
+                                        aria-describedby={form.errors.password ? "password-error" : undefined}
+                                    />
+                                </AuthFormField>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            name="password"
-                            autoComplete="new-password"
-                            value={data.password}
-                            className="mt-1 block w-full"
-                            autoFocus
-                            onChange={(e) => setData('password', e.target.value)}
-                            placeholder="Password"
-                        />
-                        <InputError message={errors.password} />
-                    </div>
+                                <AuthFormField
+                                    label="Confirm new password"
+                                    name="password_confirmation"
+                                    error={form.errors.password_confirmation}
+                                    required
+                                >
+                                    <AuthInput
+                                        id="password_confirmation"
+                                        name="password_confirmation"
+                                        type="password"
+                                        required
+                                        tabIndex={3}
+                                        autoComplete="new-password"
+                                        value={form.data.password_confirmation}
+                                        onChange={(e) => form.setData('password_confirmation', e.target.value)}
+                                        placeholder="Confirm your new password"
+                                        error={!!form.errors.password_confirmation}
+                                        aria-describedby={form.errors.password_confirmation ? "password-confirmation-error" : undefined}
+                                    />
+                                </AuthFormField>
+                            </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm password</Label>
-                        <Input
-                            id="password_confirmation"
-                            type="password"
-                            name="password_confirmation"
-                            autoComplete="new-password"
-                            value={data.password_confirmation}
-                            className="mt-1 block w-full"
-                            onChange={(e) => setData('password_confirmation', e.target.value)}
-                            placeholder="Confirm password"
-                        />
-                        <InputError message={errors.password_confirmation} className="mt-2" />
-                    </div>
+                            <AuthButton
+                                type="submit"
+                                className="w-full"
+                                tabIndex={4}
+                                loading={form.processing}
+                                loadingText="Resetting password..."
+                                aria-describedby={form.hasErrors ? "form-errors" : undefined}
+                            >
+                                Reset password
+                            </AuthButton>
 
-                    <Button type="submit" className="mt-4 w-full" disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Reset password
-                    </Button>
-                </div>
-            </form>
-        </AuthLayout>
+                            {/* General form errors */}
+                            {form.hasErrors && (
+                                <div 
+                                    id="form-errors" 
+                                    className="text-center text-sm text-destructive"
+                                    role="alert"
+                                    aria-live="assertive"
+                                >
+                                    Please correct the errors above and try again.
+                                </div>
+                            )}
+                        </>
+                    )}
+                </AuthForm>
+            </AuthCard>
+        </>
     );
 }

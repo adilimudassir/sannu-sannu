@@ -1,13 +1,10 @@
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { Head } from '@inertiajs/react';
 
-import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
+import { AuthCard } from '@/components/auth/auth-card';
+import { AuthForm, AuthFormField } from '@/components/auth/auth-form';
+import { AuthInput } from '@/components/auth/auth-input';
+import { AuthButton } from '@/components/auth/auth-button';
 
 type RegisterForm = {
     name: string;
@@ -17,103 +14,150 @@ type RegisterForm = {
 };
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-    });
-
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+    const handleSubmit = (data: RegisterForm, form: any) => {
+        form.post(route('global.register.store'), {
+            onFinish: () => form.reset('password', 'password_confirmation'),
         });
     };
 
     return (
-        <AuthLayout title="Create an account" description="Enter your details below to create your account">
+        <>
             <Head title="Register" />
-            <form className="flex flex-col gap-6" onSubmit={submit}>
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="name">Name</Label>
-                        <Input
-                            id="name"
-                            type="text"
-                            required
-                            autoFocus
-                            tabIndex={1}
-                            autoComplete="name"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
-                            disabled={processing}
-                            placeholder="Full name"
-                        />
-                        <InputError message={errors.name} className="mt-2" />
-                    </div>
+            <AuthCard 
+                title="Create an account" 
+                description="Enter your details below to create your global account"
+            >
+                <AuthForm
+                    initialData={{
+                        name: '',
+                        email: '',
+                        password: '',
+                        password_confirmation: '',
+                    }}
+                    onSubmit={handleSubmit}
+                >
+                    {(form) => (
+                        <>
+                            <div className="space-y-4">
+                                <AuthFormField
+                                    label="Full name"
+                                    name="name"
+                                    error={form.errors.name}
+                                    required
+                                >
+                                    <AuthInput
+                                        id="name"
+                                        name="name"
+                                        type="text"
+                                        required
+                                        autoFocus
+                                        tabIndex={1}
+                                        autoComplete="name"
+                                        value={form.data.name}
+                                        onChange={(e) => form.setData('name', e.target.value)}
+                                        placeholder="Full name"
+                                        error={!!form.errors.name}
+                                        aria-describedby={form.errors.name ? "name-error" : undefined}
+                                    />
+                                </AuthFormField>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            required
-                            tabIndex={2}
-                            autoComplete="email"
-                            value={data.email}
-                            onChange={(e) => setData('email', e.target.value)}
-                            disabled={processing}
-                            placeholder="email@example.com"
-                        />
-                        <InputError message={errors.email} />
-                    </div>
+                                <AuthFormField
+                                    label="Email address"
+                                    name="email"
+                                    error={form.errors.email}
+                                    required
+                                >
+                                    <AuthInput
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        required
+                                        tabIndex={2}
+                                        autoComplete="email"
+                                        value={form.data.email}
+                                        onChange={(e) => form.setData('email', e.target.value)}
+                                        placeholder="email@example.com"
+                                        error={!!form.errors.email}
+                                        aria-describedby={form.errors.email ? "email-error" : undefined}
+                                    />
+                                </AuthFormField>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            required
-                            tabIndex={3}
-                            autoComplete="new-password"
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
-                            disabled={processing}
-                            placeholder="Password"
-                        />
-                        <InputError message={errors.password} />
-                    </div>
+                                <AuthFormField
+                                    label="Password"
+                                    name="password"
+                                    error={form.errors.password}
+                                    required
+                                >
+                                    <AuthInput
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        required
+                                        tabIndex={3}
+                                        autoComplete="new-password"
+                                        value={form.data.password}
+                                        onChange={(e) => form.setData('password', e.target.value)}
+                                        placeholder="Password"
+                                        error={!!form.errors.password}
+                                        aria-describedby={form.errors.password ? "password-error" : undefined}
+                                    />
+                                </AuthFormField>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm password</Label>
-                        <Input
-                            id="password_confirmation"
-                            type="password"
-                            required
-                            tabIndex={4}
-                            autoComplete="new-password"
-                            value={data.password_confirmation}
-                            onChange={(e) => setData('password_confirmation', e.target.value)}
-                            disabled={processing}
-                            placeholder="Confirm password"
-                        />
-                        <InputError message={errors.password_confirmation} />
-                    </div>
+                                <AuthFormField
+                                    label="Confirm password"
+                                    name="password_confirmation"
+                                    error={form.errors.password_confirmation}
+                                    required
+                                >
+                                    <AuthInput
+                                        id="password_confirmation"
+                                        name="password_confirmation"
+                                        type="password"
+                                        required
+                                        tabIndex={4}
+                                        autoComplete="new-password"
+                                        value={form.data.password_confirmation}
+                                        onChange={(e) => form.setData('password_confirmation', e.target.value)}
+                                        placeholder="Confirm password"
+                                        error={!!form.errors.password_confirmation}
+                                        aria-describedby={form.errors.password_confirmation ? "password-confirmation-error" : undefined}
+                                    />
+                                </AuthFormField>
+                            </div>
 
-                    <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Create account
-                    </Button>
-                </div>
+                            <AuthButton
+                                type="submit"
+                                className="w-full"
+                                tabIndex={5}
+                                loading={form.processing}
+                                loadingText="Creating account..."
+                                aria-describedby={form.hasErrors ? "form-errors" : undefined}
+                            >
+                                Create account
+                            </AuthButton>
 
-                <div className="text-center text-sm text-muted-foreground">
-                    Already have an account?{' '}
-                    <TextLink href={route('login')} tabIndex={6}>
-                        Log in
-                    </TextLink>
-                </div>
-            </form>
-        </AuthLayout>
+                            {/* General form errors */}
+                            {form.hasErrors && (
+                                <div 
+                                    id="form-errors" 
+                                    className="text-center text-sm text-destructive"
+                                    role="alert"
+                                    aria-live="assertive"
+                                >
+                                    Please correct the errors above and try again.
+                                </div>
+                            )}
+
+                            <div className="text-center text-sm text-muted-foreground">
+                                Already have an account?{' '}
+                                <TextLink href={route('global.login')} tabIndex={6}>
+                                    Log in
+                                </TextLink>
+                            </div>
+                        </>
+                    )}
+                </AuthForm>
+            </AuthCard>
+        </>
     );
 }

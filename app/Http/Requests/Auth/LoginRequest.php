@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Services\AuditLogService;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -27,9 +28,37 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+            'email' => ['required', 'string', 'lowercase', 'email:rfc,dns', 'max:255'],
+            'password' => ['required', 'string', 'min:1'],
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'email' => $this->sanitizeEmail($this->email),
+        ]);
+    }
+
+    /**
+     * Sanitize the email input.
+     */
+    private function sanitizeEmail(?string $email): ?string
+    {
+        if (!$email) {
+            return $email;
+        }
+
+        // Trim and convert to lowercase
+        $email = strtolower(trim($email));
+        
+        // Sanitize email
+        $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+        
+        return $email;
     }
 
     /**
@@ -44,10 +73,19 @@ class LoginRequest extends FormRequest
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
+            // Log failed login attempt for audit purposes
+            AuditLogService::logAuthEvent('login_failed', null, $this, [
+                'email' => $this->string('email'),
+                'attempts' => RateLimiter::attempts($this->throttleKey()),
+            ]);
+
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);
         }
+
+        // Log successful login for audit purposes
+        AuditLogService::logAuthEvent('login_success', Auth::user(), $this);
 
         RateLimiter::clear($this->throttleKey());
     }
@@ -64,6 +102,12 @@ class LoginRequest extends FormRequest
         }
 
         event(new Lockout($this));
+
+        // Log account lockout for audit purposes
+        AuditLogService::logAuthEvent('login_locked', null, $this, [
+            'email' => $this->string('email'),
+            'attempts' => RateLimiter::attempts($this->throttleKey()),
+        ]);
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
