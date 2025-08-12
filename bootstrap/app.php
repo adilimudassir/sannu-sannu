@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,
+            \App\Http\Middleware\SessionActivityMiddleware::class,
             \App\Http\Middleware\IdentifyTenant::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'tenant' => \App\Http\Middleware\IdentifyTenant::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'session.activity' => \App\Http\Middleware\SessionActivityMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Services\AuditLogService;
+use App\Services\SessionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,10 @@ use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
+    public function __construct(
+        private SessionService $sessionService
+    ) {}
+
     /**
      * Show the login page.
      */
@@ -32,9 +37,13 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
-        $request->session()->regenerate();
-
         $user = $request->user();
+
+        // Create secure global session
+        $this->sessionService->createGlobalSession($user, $request);
+
+        // Log successful login
+        AuditLogService::logAuthEvent('login_success', $user, $request);
 
         // Role-based redirect logic
         if ($user->isSystemAdmin()) {
@@ -54,18 +63,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $user = $request->user();
+        // Use SessionService to properly destroy session
+        $this->sessionService->destroySession($request);
 
-        // Log logout event before destroying session
-        if ($user) {
-            AuditLogService::logAuthEvent('logout', $user, $request);
-        }
-
-        Auth::guard('web')->logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('/');
+        return redirect('/')->with('status', 'You have been logged out successfully.');
     }
 }

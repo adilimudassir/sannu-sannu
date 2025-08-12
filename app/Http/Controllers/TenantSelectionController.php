@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\Tenant;
+use App\Services\SessionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 
 class TenantSelectionController extends Controller
 {
+    public function __construct(
+        private SessionService $sessionService
+    ) {}
+
     /**
      * Show tenant selection page for admin users
      */
@@ -54,8 +59,10 @@ class TenantSelectionController extends Controller
             abort(403, 'You do not have access to this tenant.');
         }
         
-        // Store selected tenant in session
-        session(['selected_tenant_id' => $tenantId]);
+        // Set tenant context using SessionService
+        if (!$this->sessionService->setTenantContext($tenantId, $request)) {
+            return back()->withErrors(['tenant_id' => 'Unable to set tenant context.']);
+        }
         
         // Get tenant for redirect
         $tenant = Tenant::findOrFail($tenantId);

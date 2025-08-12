@@ -57,14 +57,14 @@
     - Configure security headers and audit logging for auth events
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
 
-- [-]   9. Create Global Session Management with Optional Tenant Context
+- [x]   9. Create Global Session Management with Optional Tenant Context
     - Implement secure global session creation using Laravel Sanctum
     - Add tenant context storage in session for admin users after tenant selection
     - Implement session expiration handling with proper user feedback
     - Add session invalidation on password changes and multi-device session management
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6_
 
-- [ ]   10. Implement Email Verification Enhancement
+- [-]   10. Implement Email Verification Enhancement
     - Update email verification to work within tenant context
     - Create responsive email verification UI components
     - Implement verification link expiration and renewal functionality

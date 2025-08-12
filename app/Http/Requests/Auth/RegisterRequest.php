@@ -35,20 +35,21 @@ class RegisterRequest extends FormRequest
                 'required',
                 'string',
                 'lowercase',
-                'email:rfc,dns',
+                // 'email:rfc,dns',
+                'email',
                 'max:255',
                 Rule::unique(User::class),
             ],
             'password' => [
                 'required',
                 'confirmed',
-                Rules\Password::defaults()
-                    ->min(8)
-                    ->letters()
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()
-                    ->uncompromised(),
+                // Rules\Password::defaults()
+                //     ->min(8)
+                //     ->letters()
+                //     ->mixedCase()
+                //     ->numbers()
+                //     ->symbols()
+                //     ->uncompromised(),
             ],
         ];
     }
@@ -88,10 +89,10 @@ class RegisterRequest extends FormRequest
 
         // Remove extra whitespace and trim
         $name = preg_replace('/\s+/', ' ', trim($name));
-        
+
         // Remove any potentially harmful characters while preserving international names
         $name = filter_var($name, FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES);
-        
+
         return $name;
     }
 
@@ -106,10 +107,10 @@ class RegisterRequest extends FormRequest
 
         // Trim and convert to lowercase
         $email = strtolower(trim($email));
-        
+
         // Sanitize email
         $email = filter_var($email, FILTER_SANITIZE_EMAIL);
-        
+
         return $email;
     }
 }

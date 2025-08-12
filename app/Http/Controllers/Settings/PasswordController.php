@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Services\SessionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,6 +13,10 @@ use Inertia\Response;
 
 class PasswordController extends Controller
 {
+    public function __construct(
+        private SessionService $sessionService
+    ) {}
+
     /**
      * Show the user's password settings page.
      */
@@ -30,10 +35,19 @@ class PasswordController extends Controller
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
-        $request->user()->update([
+        $user = $request->user();
+
+        // Update password
+        $user->update([
             'password' => Hash::make($validated['password']),
         ]);
 
-        return back();
+        // Invalidate all other sessions for security
+        $this->sessionService->invalidateAllUserSessions($user);
+
+        // Create new session for current user
+        $this->sessionService->createGlobalSession($user, $request);
+
+        return back()->with('status', 'Password updated successfully. All other sessions have been logged out for security.');
     }
 }

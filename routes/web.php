@@ -60,6 +60,16 @@ Route::middleware('auth')->group(function () {
         })->name('users');
     });
     
+    // Session management routes
+    Route::get('settings/sessions', [App\Http\Controllers\SessionManagementController::class, 'index'])
+        ->name('sessions.index');
+    Route::delete('settings/sessions/{sessionId}', [App\Http\Controllers\SessionManagementController::class, 'destroy'])
+        ->name('sessions.destroy');
+    Route::post('settings/sessions/destroy-others', [App\Http\Controllers\SessionManagementController::class, 'destroyOthers'])
+        ->name('sessions.destroy-others');
+    Route::post('settings/clear-tenant-context', [App\Http\Controllers\SessionManagementController::class, 'clearTenantContext'])
+        ->name('sessions.clear-tenant-context');
+    
     Route::post('logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 });
