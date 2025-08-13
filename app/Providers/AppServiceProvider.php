@@ -23,5 +23,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Project::class, ProjectPolicy::class);
+        
+        // Configure authentication redirect for Authentication
+        \Illuminate\Auth\Middleware\Authenticate::redirectUsing(function ($request) {
+            return route('login');
+        });
     }
 }

@@ -58,7 +58,7 @@ class EmailVerificationIntegrationTest extends TestCase
         $response = $this->actingAs($user)->get($verificationUrl);
 
         // 6. User should be redirected to global dashboard after verification
-        $response->assertRedirect(route('global.dashboard') . '?verified=1');
+        $response->assertRedirect(route('dashboard') . '?verified=1');
 
         // 7. Verify the user's email is now verified
         $this->assertTrue($user->fresh()->hasVerifiedEmail());

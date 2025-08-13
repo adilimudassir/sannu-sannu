@@ -53,7 +53,7 @@ test('global password can be reset with valid token', function () {
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('global.login'));
+            ->assertRedirect(route('login'));
 
         return true;
     });

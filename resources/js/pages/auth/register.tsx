@@ -15,7 +15,7 @@ type RegisterForm = {
 
 export default function Register() {
     const handleSubmit = (data: RegisterForm, form: any) => {
-        form.post(route('global.register.store'), {
+        form.post(route('register.store'), {
             onFinish: () => form.reset('password', 'password_confirmation'),
         });
     };
@@ -150,7 +150,7 @@ export default function Register() {
 
                             <div className="text-center text-sm text-muted-foreground">
                                 Already have an account?{' '}
-                                <TextLink href={route('global.login')} tabIndex={6}>
+                                <TextLink href={route('login')} tabIndex={6}>
                                     Log in
                                 </TextLink>
                             </div>

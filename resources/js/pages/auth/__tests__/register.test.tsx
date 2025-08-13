@@ -29,8 +29,8 @@ vi.mock('@inertiajs/react', () => ({
 // Mock route helper
 global.route = vi.fn((name: string) => {
   const routes: Record<string, string> = {
-    'global.register.store': '/register',
-    'global.login': '/login',
+    'register.store': '/register',
+    'login': '/login',
   }
   return routes[name] || `/${name}`
 })

@@ -23,7 +23,7 @@ interface LoginProps {
 
 export default function Login({ status, canResetPassword, errors: serverErrors }: LoginProps) {
     const handleSubmit = (data: LoginForm, form: any) => {
-        form.post(route('global.login.store'), {
+        form.post(route('login.store'), {
             onFinish: () => form.reset('password'),
         });
     };
@@ -90,7 +90,7 @@ export default function Login({ status, canResetPassword, errors: serverErrors }
                                             <div className="flex items-center justify-between">
                                                 <span></span>
                                                 <TextLink 
-                                                    href={route('global.password.request')} 
+                                                    href={route('password.request')} 
                                                     className="text-sm" 
                                                     tabIndex={5}
                                                 >
@@ -157,7 +157,7 @@ export default function Login({ status, canResetPassword, errors: serverErrors }
 
                             <div className="text-center text-sm text-muted-foreground">
                                 Don't have an account?{' '}
-                                <TextLink href={route('global.register')} tabIndex={6}>
+                                <TextLink href={route('register')} tabIndex={6}>
                                     Sign up
                                 </TextLink>
                             </div>

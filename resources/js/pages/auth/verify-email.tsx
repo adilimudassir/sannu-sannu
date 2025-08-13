@@ -87,7 +87,7 @@ export default function VerifyEmail({ status, user }: VerifyEmailProps) {
                     {statusMessage && (
                         <Alert className={statusMessage.type === 'success' ? 'border-green-200 bg-green-50' : 'border-yellow-200 bg-yellow-50'}>
                             <div className="flex items-center">
-                                {statusMessage.icon}
+                                {statusMessage.icon}    
                                 <AlertDescription className="ml-2">
                                     {statusMessage.message}
                                 </AlertDescription>

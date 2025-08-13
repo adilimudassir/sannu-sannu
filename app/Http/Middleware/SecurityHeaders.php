@@ -53,10 +53,6 @@ class SecurityHeaders
     private function isAuthRoute(Request $request): bool
     {
         $authRoutes = [
-            'global.login',
-            'global.register',
-            'global.password.request',
-            'global.password.reset',
             'login',
             'register',
             'password.request',

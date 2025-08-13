@@ -62,6 +62,6 @@ class EmailVerificationNotificationController extends Controller
         }
 
         // Contributors go to global dashboard
-        return redirect()->intended(route('global.dashboard'));
+        return redirect()->intended(route('dashboard'));
     }
 }

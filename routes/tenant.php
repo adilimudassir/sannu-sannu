@@ -12,21 +12,24 @@ use App\Http\Controllers\ProjectInvitationController;
 |
 | These routes are available within tenant context, both for subdomain-based
 | and path-based tenant routing. They handle tenant-specific functionality.
+| All routes here have tenant context available via the IdentifyTenant middleware.
 |
 */
 
+// Tenant-specific authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Tenant dashboard
     Route::get('dashboard', fn() => Inertia::render('dashboard'))
         ->name('dashboard');
+    
+    // Project management routes
+    Route::resource('projects', ProjectController::class);
+    
+    // Project invitation routes (nested under projects)
+    Route::resource('projects.invitations', ProjectInvitationController::class)
+        ->shallow()
+        ->only(['store']);
 });
 
-// Project management
-Route::resource('projects.invitations', ProjectInvitationController::class)
-    ->shallow()
-    ->only(['store']);
-
-Route::resource('projects', ProjectController::class);
-
-// Include tenant-specific settings and auth routes
+// Include tenant-specific settings routes
 require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';

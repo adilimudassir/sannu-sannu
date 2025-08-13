@@ -16,7 +16,7 @@ interface ForgotPasswordProps {
 
 export default function ForgotPassword({ status }: ForgotPasswordProps) {
     const handleSubmit = (data: ForgotPasswordForm, form: any) => {
-        form.post(route('global.password.email'));
+        form.post(route('password.email'));
     };
 
     return (
@@ -94,7 +94,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
 
                             <div className="text-center text-sm text-muted-foreground">
                                 Remember your password?{' '}
-                                <TextLink href={route('global.login')} tabIndex={3}>
+                                <TextLink href={route('login')} tabIndex={3}>
                                     Back to log in
                                 </TextLink>
                             </div>

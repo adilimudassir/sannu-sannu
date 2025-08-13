@@ -12,7 +12,7 @@ class RegisterPageTest extends TestCase
 
     public function test_register_page_renders_with_auth_card_layout(): void
     {
-        $response = $this->get(route('global.register'));
+        $response = $this->get(route('register'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => 
@@ -22,7 +22,7 @@ class RegisterPageTest extends TestCase
 
     public function test_register_page_has_correct_form_fields(): void
     {
-        $response = $this->get(route('global.register'));
+        $response = $this->get(route('register'));
 
         $response->assertStatus(200);
         // The page should render without errors, indicating all form fields are properly structured
@@ -30,28 +30,28 @@ class RegisterPageTest extends TestCase
 
     public function test_register_form_submits_to_correct_global_route(): void
     {
-        $response = $this->post(route('global.register.store'), [
+        $response = $this->post(route('register.store'), [
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
         ]);
 
-        $response->assertRedirect(route('global.dashboard'));
+        $response->assertRedirect(route('dashboard'));
         $this->assertAuthenticated();
     }
 
     public function test_register_page_shows_login_link(): void
     {
-        $response = $this->get(route('global.register'));
+        $response = $this->get(route('register'));
 
         $response->assertStatus(200);
-        // The component should render the login link pointing to global.login
+        // The component should render the login link pointing to login
     }
 
     public function test_registration_creates_global_user_with_contributor_role(): void
     {
-        $this->post(route('global.register.store'), [
+        $this->post(route('register.store'), [
             'name' => 'Global User',
             'email' => 'global@example.com',
             'password' => 'password',
@@ -69,7 +69,7 @@ class RegisterPageTest extends TestCase
         // Create a user first
         User::factory()->create(['email' => 'existing@example.com']);
 
-        $response = $this->post(route('global.register.store'), [
+        $response = $this->post(route('register.store'), [
             'name' => 'Another User',
             'email' => 'existing@example.com',
             'password' => 'password',

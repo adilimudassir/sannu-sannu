@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +17,7 @@ Route::middleware('can:manage-platform')
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('dashboard', fn() => Inertia::render('admin/system-dashboard'))
+        Route::get('/dashboard', fn() => Inertia::render('admin/dashboard'))
             ->name('dashboard');
         
         Route::get('tenants', fn() => Inertia::render('admin/tenants'))

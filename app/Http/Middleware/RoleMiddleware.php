@@ -20,11 +20,7 @@ class RoleMiddleware
     {
         // Check if user is authenticated
         if (!Auth::check()) {
-            // Try to get tenant from the request for proper login redirect
-            $tenant = $request->route('tenant');
-            if ($tenant) {
-                return redirect()->route('login', ['tenant' => $tenant]);
-            }
+            // Redirect to global login for unauthenticated users
             return redirect()->route('login');
         }
 
@@ -35,11 +31,41 @@ class RoleMiddleware
             return Role::from($role);
         }, $roles);
 
-        // Check if user has any of the required roles
-        if (!$user->hasAnyRole($requiredRoles)) {
+        // Get current tenant if available
+        $tenant = app('tenant', null);
+        
+        // Check if user has any of the required roles (global or tenant-specific)
+        $hasPermission = false;
+        
+        foreach ($requiredRoles as $role) {
+            if ($this->userHasRole($user, $role, $tenant)) {
+                $hasPermission = true;
+                break;
+            }
+        }
+
+        if (!$hasPermission) {
             abort(403, 'Insufficient permissions. Required roles: ' . implode(', ', $roles));
         }
 
         return $next($request);
+    }
+
+    /**
+     * Check if user has the specified role
+     */
+    protected function userHasRole($user, Role $role, $tenant = null): bool
+    {
+        // Check global roles first
+        if ($user->role === $role) {
+            return true;
+        }
+
+        // Check tenant-specific roles if tenant context is available
+        if ($tenant && method_exists($user, 'hasRoleInTenant')) {
+            return $user->hasRoleInTenant($role, $tenant->id);
+        }
+
+        return false;
     }
 }

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The session management system provides secure global authentication with optional tenant context for multi-tenant applications. It includes features like session expiration, multi-device session management, and tenant context switching.
+The session management system provides secure Authentication with optional tenant context for multi-tenant applications. It includes features like session expiration, multi-device session management, and tenant context switching.
 
 ## Key Features
 
@@ -89,7 +89,7 @@ public function store(LoginRequest $request): RedirectResponse
     } elseif ($user->needsTenantSelection()) {
         return redirect()->route('tenant.select');
     } else {
-        return redirect()->route('global.dashboard');
+        return redirect()->route('dashboard');
     }
 }
 ```

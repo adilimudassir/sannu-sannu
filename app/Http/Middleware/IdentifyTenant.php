@@ -20,13 +20,57 @@ class IdentifyTenant
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Check if this is a tenant-scoped route
+        $isTenantRoute = $this->isTenantRoute($request);
+        
         $tenant = $this->resolveTenant($request);
         
         if ($tenant) {
             $this->setTenantContext($tenant, $request);
+        } elseif ($isTenantRoute) {
+            // If this is a tenant route but no tenant was found, handle the error
+            $this->handleTenantRequired($request);
         }
 
         return $next($request);
+    }
+
+    /**
+     * Check if the current route requires tenant context
+     */
+    protected function isTenantRoute(Request $request): bool
+    {
+        $route = $request->route();
+        
+        if (!$route) {
+            return false;
+        }
+
+        // Check if route has tenant parameter
+        if ($route->hasParameter('tenant')) {
+            return true;
+        }
+
+        $routeNamesExceptions = [
+            'tenant.select',
+            'tenant.select.store'
+        ];
+
+        if (in_array($route->getName(), $routeNamesExceptions)) {
+            return false;
+        }
+
+        // Check if route name starts with 'tenant.'
+        $routeName = $route->getName();
+        if ($routeName && str_starts_with($routeName, 'tenant.')) {
+            return true;
+        }
+
+        // Check if this is a subdomain-based tenant route
+        $host = $request->getHost();
+        $appUrl = parse_url(config('app.url'), PHP_URL_HOST);
+        
+        return $appUrl && str_ends_with($host, '.' . $appUrl) && $host !== $appUrl;
     }
 
     /**
@@ -150,12 +194,35 @@ class IdentifyTenant
         // For web requests, redirect to main site with error message
         if ($source === 'subdomain') {
             // Redirect to main domain with error
-            $mainUrl = config('app.url') . '?error=tenant_not_found&slug=' . urlencode($slug);
+            $mainUrl = config('app.url') . '/tenant-not-found?slug=' . urlencode($slug);
             abort(redirect($mainUrl));
         } else {
-            // For path-based, show 404 page
+            // For path-based, redirect to tenant not found page
+            abort(redirect()->route('tenant.not-found', ['slug' => $slug]));
+        }
+    }
+
+    /**
+     * Handle cases where tenant is required but not found
+     */
+    protected function handleTenantRequired(Request $request): void
+    {
+        $slug = $request->route('tenant') ?? 'unknown';
+        
+        Log::warning('Tenant required but not found', [
+            'slug' => $slug,
+            'request_url' => $request->fullUrl(),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        // For API requests, return JSON error
+        if ($request->expectsJson()) {
             abort(404, 'Organization not found');
         }
+
+        // For web requests, redirect to tenant not found page
+        abort(redirect()->route('tenant.not-found', ['slug' => $slug]));
     }
 
     /**

@@ -1,8 +1,8 @@
-# Global Authentication Architecture
+# Authentication Architecture
 
 ## Overview
 
-The Sannu-Sannu platform uses a **Global Authentication System** that allows users to authenticate once and access multiple tenants based on their roles. This architecture supports cross-tenant project discovery for contributors while maintaining secure tenant-specific management for administrators.
+The Sannu-Sannu platform uses a **Authentication System** that allows users to authenticate once and access multiple tenants based on their roles. This architecture supports cross-tenant project discovery for contributors while maintaining secure tenant-specific management for administrators.
 
 ## Architecture Principles
 
@@ -90,7 +90,7 @@ flowchart TD
 
 ### Global Routes (No Tenant Context)
 ```
-/login                  - Global authentication
+/login                  - Authentication
 /register              - Global user registration
 /dashboard             - Global contributor dashboard
 /select-tenant         - Tenant selection for admins
@@ -222,7 +222,7 @@ $tenantId = session('selected_tenant_id');
 
 ## Migration Considerations
 
-### From Tenant-Scoped to Global Auth
+### From Tenant-Scoped to Auth
 1. **User Data Migration**: Remove tenant_id, create user_tenant_roles
 2. **Route Updates**: Add global routes, maintain tenant routes
 3. **Controller Updates**: Handle optional tenant context
@@ -236,7 +236,7 @@ $tenantId = session('selected_tenant_id');
 ## Security Measures
 
 ### Authentication Security
-- Global authentication with secure session management
+- Authentication with secure session management
 - Role-based access control at multiple levels
 - Tenant access validation for all operations
 
@@ -250,4 +250,4 @@ $tenantId = session('selected_tenant_id');
 - Tenant-level policies for organizational operations
 - Project-level policies for specific resource access
 
-This global authentication architecture provides the flexibility needed for cross-tenant collaboration while maintaining security and proper access control at all levels.
+This Authentication architecture provides the flexibility needed for cross-tenant collaboration while maintaining security and proper access control at all levels.

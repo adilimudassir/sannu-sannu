@@ -19,7 +19,7 @@ type ResetPasswordForm = {
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
     const handleSubmit = (data: ResetPasswordForm, form: any) => {
-        form.post(route('global.password.store'), {
+        form.post(route('password.store'), {
             onFinish: () => form.reset('password', 'password_confirmation'),
         });
     };

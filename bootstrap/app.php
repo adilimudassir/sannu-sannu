@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\SessionActivityMiddleware::class,
+            // Note: IdentifyTenant is applied globally but only sets context when tenant is found
             \App\Http\Middleware\IdentifyTenant::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,

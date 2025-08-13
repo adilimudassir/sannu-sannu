@@ -14,7 +14,7 @@ class LoginPageTest extends TestCase
 
     public function test_login_page_can_be_rendered(): void
     {
-        $response = $this->get(route('global.login'));
+        $response = $this->get(route('login'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => 
@@ -29,12 +29,12 @@ class LoginPageTest extends TestCase
             'role' => Role::CONTRIBUTOR,
         ]);
 
-        $response = $this->post(route('global.login.store'), [
+        $response = $this->post(route('login.store'), [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $response->assertRedirect(route('global.dashboard'));
+        $response->assertRedirect(route('dashboard'));
         $this->assertAuthenticatedAs($user);
     }
 
@@ -44,7 +44,7 @@ class LoginPageTest extends TestCase
             'role' => Role::SYSTEM_ADMIN,
         ]);
 
-        $response = $this->post(route('global.login.store'), [
+        $response = $this->post(route('login.store'), [
             'email' => $user->email,
             'password' => 'password',
         ]);
@@ -55,7 +55,7 @@ class LoginPageTest extends TestCase
 
     public function test_invalid_credentials_show_error(): void
     {
-        $response = $this->post(route('global.login.store'), [
+        $response = $this->post(route('login.store'), [
             'email' => 'invalid@example.com',
             'password' => 'wrong-password',
         ]);
@@ -66,7 +66,7 @@ class LoginPageTest extends TestCase
 
     public function test_validation_errors_are_shown(): void
     {
-        $response = $this->post(route('global.login.store'), [
+        $response = $this->post(route('login.store'), [
             'email' => '',
             'password' => '',
         ]);
@@ -91,7 +91,7 @@ class LoginPageTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->post(route('global.login.store'), [
+        $response = $this->post(route('login.store'), [
             'email' => $user->email,
             'password' => 'password',
         ]);

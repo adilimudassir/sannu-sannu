@@ -2,16 +2,16 @@
 
 ## Introduction
 
-This document outlines the requirements for the **Global Authentication System** implemented for the Sannu-Sannu multi-tenant SaaS platform. The system provides global user authentication with multi-tenant role-based access control, allowing users to authenticate once and access multiple tenant organizations based on their permissions.
+This document outlines the requirements for the **Authentication System** implemented for the Sannu-Sannu multi-tenant SaaS platform. The system provides global user authentication with multi-tenant role-based access control, allowing users to authenticate once and access multiple tenant organizations based on their permissions.
 
 ## 🚨 **MAJOR ARCHITECTURE CHANGE** 🚨
 
 **Previous System**: Tenant-scoped authentication where users belonged to specific tenants.
-**New System**: Global authentication where users authenticate once and can access multiple tenants based on their roles.
+**New System**: Authentication where users authenticate once and can access multiple tenants based on their roles.
 
 ## Requirements
 
-### Requirement 1: Global Authentication UI
+### Requirement 1: Authentication UI
 
 **User Story:** As a user, I want to authenticate globally without needing to specify a tenant, so that I can access projects and features across all organizations based on my permissions.
 

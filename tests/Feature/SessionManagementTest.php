@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Enums\Role;
+use Tests\TestCase;
 use App\Models\User;
 use App\Models\Tenant;
-use App\Enums\Role;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class SessionManagementTest extends TestCase
 {
@@ -158,18 +158,18 @@ class SessionManagementTest extends TestCase
             'password' => bcrypt('password'),
         ]);
 
-        $response = $this->post(route('global.login.store'), [
+        $response = $this->post(route('login.store'), [
             'email' => 'test@example.com',
             'password' => 'password',
         ]);
 
-        $response->assertRedirect(route('global.dashboard'));
+        $response->assertRedirect(route('dashboard'));
         
         // Check that user is authenticated
         $this->assertAuthenticated();
         
         // Make a follow-up request to check session data
-        $this->get(route('global.dashboard'));
+        $this->get(route('dashboard'));
         
         $this->assertEquals($testUser->id, session('user_id'));
         $this->assertEquals(Role::CONTRIBUTOR->value, session('global_role'));
@@ -284,7 +284,7 @@ class SessionManagementTest extends TestCase
         $this->actingAs($this->user);
         
         // Make a request that should trigger the middleware
-        $response = $this->get(route('global.dashboard'));
+        $response = $this->get(route('dashboard'));
         
         $response->assertOk();
         $this->assertNotNull(session('last_activity'));
@@ -301,9 +301,9 @@ class SessionManagementTest extends TestCase
         // Manually set an expired session
         session(['last_activity' => now()->subHours(3)]);
         
-        $response = $this->get(route('global.dashboard'));
+        $response = $this->get(route('dashboard'));
         
-        $response->assertRedirect(route('global.login'));
+        $response->assertRedirect(route('login'));
         $response->assertSessionHas('status', 'Your session has expired. Please log in again.');
     }
 

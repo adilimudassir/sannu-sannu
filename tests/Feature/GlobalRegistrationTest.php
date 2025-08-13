@@ -29,7 +29,7 @@ class GlobalRegistrationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('global.dashboard'));
+        $response->assertRedirect(route('dashboard'));
         
         // Verify user was created with contributor role
         $user = User::where('email', 'test@example.com')->first();

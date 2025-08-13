@@ -1,9 +1,9 @@
-# Global Authentication & Authorization Implementation Plan
+# Authentication & Authorization Implementation Plan
 
-## 🚨 **UPDATED FOR GLOBAL AUTHENTICATION ARCHITECTURE** 🚨
+## 🚨 **UPDATED FOR AutHENTICATION ARCHITECTURE** 🚨
 
-- [x]   1. Setup Global Authentication Infrastructure
-    - Create global authentication routes (/login, /register, /dashboard) without tenant context
+- [x]   1. Setup Authentication Infrastructure
+    - Create Authentication routes (/login, /register, /dashboard) without tenant context
     - Implement TenantMiddleware for optional tenant context in operational routes
     - Update middleware registration for global vs tenant-specific routes
     - _Requirements: 1.1, 5.1, 5.6_
@@ -12,7 +12,7 @@
     - Remove tenant_id from users table and create UserTenantRole pivot table
     - Update User model with global roles (system_admin, contributor) and tenant role relationships
     - Implement multi-tenant role checking methods and tenant selection logic
-    - Create database migrations for global authentication schema
+    - Create database migrations for Authentication schema
     - _Requirements: 4.1, 4.2, 5.2, 5.4_
 
 - [x]   3. Create Multi-Level Role-Based Access Control System
@@ -32,7 +32,7 @@
 - [x]   5. Enhance Global Login System with Role-Based Redirects
     - Update Login page component to use new AuthCard layout with responsive design
     - Implement role-based redirect logic (contributors → global dashboard, admins → tenant selection, system admins → system dashboard)
-    - Integrate global authentication with new UI components
+    - Integrate Authentication with new UI components
     - Add proper error message display and loading states with accessibility features
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
@@ -106,13 +106,13 @@
     - Perform security testing and validation of all implemented features
     - _Requirements: All requirements final validation_
 
-## 🚨 **NEW TASKS FOR GLOBAL AUTHENTICATION MIGRATION** 🚨
+## 🚨 **NEW TASKS FOR AutHENTICATION MIGRATION** 🚨
 
-- [ ]   16. Migrate to Global Authentication Architecture
+- [ ]   16. Migrate to Authentication Architecture
     - Update database schema to remove tenant_id from users table
     - Create UserTenantRole pivot table for multi-tenant role assignments
     - Migrate existing tenant-scoped users to global users with appropriate tenant roles
-    - Update all existing seeders and factories for global authentication
+    - Update all existing seeders and factories for Authentication
     - _Requirements: 4.1, 5.1, 5.2_
 
 - [ ]   17. Implement Tenant Selection Interface
@@ -129,10 +129,10 @@
     - Add unified contribution tracking across all tenants
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
 
-- [ ]   19. Update Role-Based Access Control for Global Authentication
+- [ ]   19. Update Role-Based Access Control for Authentication
     - Update all existing policies to handle global vs tenant-specific roles
     - Implement new role checking methods in User model for multi-tenant roles
-    - Update RoleMiddleware to work with global authentication and tenant context
+    - Update RoleMiddleware to work with Authentication and tenant context
     - Create new policies for cross-tenant operations and system administration
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6_
 
@@ -150,8 +150,8 @@
     - Implement logout functionality that clears both authentication and tenant context
     - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 3.1, 3.2_
 
-- [ ]   22. Update Route Structure for Global Authentication
-    - Create global authentication routes (/login, /register, /dashboard, /select-tenant)
+- [ ]   22. Update Route Structure for Authentication
+    - Create Authentication routes (/login, /register, /dashboard, /select-tenant)
     - Update existing tenant-specific routes to work with optional tenant context
     - Implement proper middleware application for global vs tenant-scoped routes
     - Add system admin routes for platform-wide administration
@@ -164,16 +164,16 @@
     - Add tenant information display in project listings and details
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ]   24. Update Testing Suite for Global Authentication
-    - Update all existing tests to work with global authentication schema
+- [ ]   24. Update Testing Suite for Authentication
+    - Update all existing tests to work with Authentication schema
     - Create new tests for tenant selection and cross-tenant functionality
     - Add tests for role-based redirects and global dashboard functionality
     - Implement integration tests for multi-tenant role assignments
-    - _Requirements: All requirements validation for global authentication_
+    - _Requirements: All requirements validation for Authentication_
 
 - [ ]   25. Update Email Verification for Global System
     - Remove tenant context from email verification process
     - Update email verification to work with global user accounts
     - Ensure verification links work regardless of tenant context
-    - Update email templates to reflect global authentication
+    - Update email templates to reflect Authentication
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_

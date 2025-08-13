@@ -2,7 +2,7 @@
 
 ## Overview
 
-The email verification system has been enhanced to work seamlessly with the global authentication architecture, providing a secure and user-friendly experience for email verification across all user roles.
+The email verification system has been enhanced to work seamlessly with the Authentication architecture, providing a secure and user-friendly experience for email verification across all user roles.
 
 ## Features
 

@@ -55,6 +55,6 @@ class VerifyEmailController extends Controller
         }
 
         // Contributors go to global dashboard
-        return redirect()->intended(route('global.dashboard') . $verifiedParam);
+        return redirect()->intended(route('dashboard') . $verifiedParam);
     }
 }

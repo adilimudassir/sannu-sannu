@@ -22,9 +22,7 @@ export default function SelectTenant({ tenants }: SelectTenantProps) {
     const { post, processing } = useForm();
 
     const selectTenant = (tenantId: number) => {
-        post(route('tenant.select.store'), {
-            data: { tenant_id: tenantId },
-        });
+        post(route('tenant.select.store', { tenant_id: tenantId }));
     };
 
     const getRoleBadgeVariant = (role: string) => {
@@ -110,7 +108,7 @@ export default function SelectTenant({ tenants }: SelectTenantProps) {
                                 </p>
                                 <Button 
                                     variant="outline" 
-                                    onClick={() => window.location.href = route('global.dashboard')}
+                                    onClick={() => window.location.href = route('dashboard')}
                                 >
                                     Go to Dashboard
                                 </Button>

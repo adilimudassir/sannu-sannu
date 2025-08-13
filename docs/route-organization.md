@@ -20,7 +20,7 @@ routes/
 ### 1. Global Routes (`routes/global.php`)
 Routes that are available globally without tenant context:
 - Home page
-- Global authentication (login, register, password reset)
+- Authentication (login, register, password reset)
 - Email verification
 - Global dashboard
 - Tenant selection
@@ -47,7 +47,7 @@ Routes that require tenant context (both subdomain and path-based):
 ## Route Naming Conventions
 
 ### Global Routes
-- `global.login` - Global login page
+- `login` - Global login page
 - `profile.edit` - Global profile settings
 - `admin.dashboard` - System admin dashboard
 

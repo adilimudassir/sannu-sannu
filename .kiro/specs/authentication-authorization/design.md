@@ -2,12 +2,12 @@
 
 ## Overview
 
-This design document outlines the **Global Authentication System** implemented for the Sannu-Sannu platform. The system provides global user authentication with multi-tenant role-based access control, allowing users to authenticate once and access multiple tenant organizations based on their permissions.
+This design document outlines the **Authentication System** implemented for the Sannu-Sannu platform. The system provides global user authentication with multi-tenant role-based access control, allowing users to authenticate once and access multiple tenant organizations based on their permissions.
 
 ## 🚨 **ARCHITECTURAL CHANGE** 🚨
 
 **Previous Design**: Tenant-scoped authentication with users tied to specific tenants.
-**New Design**: Global authentication with flexible multi-tenant role assignments.
+**New Design**: Authentication with flexible multi-tenant role assignments.
 
 ## Architecture
 
@@ -33,7 +33,7 @@ graph TB
     P[Tenant Dashboard] --> Q[Tenant-Scoped Data]
 ```
 
-### Global Authentication Flow
+### Authentication Flow
 
 ```mermaid
 sequenceDiagram
@@ -45,7 +45,7 @@ sequenceDiagram
     participant TS as Tenant Selection
     
     U->>AC: Request /login
-    AC->>AS: Process global authentication
+    AC->>AS: Process Authentication
     AS->>DB: Query user globally
     DB->>AS: Return user data with roles
     AS->>AC: Authentication result
@@ -268,21 +268,21 @@ class Tenant extends Model
 
 ### Route Structure
 ```php
-// Global authentication routes (no tenant context required)
+// Authentication routes (no tenant context required)
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
-        ->name('global.login');
+        ->name('login');
     Route::post('login', [AuthenticatedSessionController::class, 'store'])
-        ->name('global.login.store');
+        ->name('login.store');
     Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('global.register');
-    // ... other global auth routes
+        ->name('register');
+    // ... other Auth routes
 });
 
-// Global authenticated routes
+// Authenticated routes
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', GlobalDashboardController::class)
-        ->name('global.dashboard');
+        ->name('dashboard');
     Route::get('select-tenant', [TenantSelectionController::class, 'show'])
         ->name('tenant.select');
     Route::post('select-tenant', [TenantSelectionController::class, 'store'])

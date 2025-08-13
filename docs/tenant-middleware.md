@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Tenant Middleware (`IdentifyTenant`) is responsible for extracting tenant information from incoming requests and setting the appropriate tenant context throughout the application. **Note**: With the new global authentication system, tenant context is now optional for many operations.
+The Tenant Middleware (`IdentifyTenant`) is responsible for extracting tenant information from incoming requests and setting the appropriate tenant context throughout the application. **Note**: With the new Authentication system, tenant context is now optional for many operations.
 
 ## Features
 
@@ -10,7 +10,7 @@ The Tenant Middleware (`IdentifyTenant`) is responsible for extracting tenant in
 - **Subdomain Resolution**: Extracts tenant from subdomain (e.g., `acme.sannu-sannu.com`)
 - **Path Resolution**: Extracts tenant from URL path (e.g., `/acme/dashboard`)
 - **Fallback Support**: Gracefully handles both resolution methods
-- **Optional Context**: Many routes now work without tenant context (global authentication)
+- **Optional Context**: Many routes now work without tenant context (Authentication)
 
 ### Error Handling
 - **Invalid Tenant**: Returns 404 for non-existent tenants
@@ -75,7 +75,7 @@ The middleware is applied to tenant-scoped routes, but many routes now work glob
 ```php
 // Global routes (no tenant context required)
 Route::middleware('auth')->group(function () {
-    Route::get('dashboard', GlobalDashboardController::class)->name('global.dashboard');
+    Route::get('dashboard', GlobalDashboardController::class)->name('dashboard');
     Route::get('select-tenant', TenantSelectionController::class)->name('tenant.select');
     // System admin routes
     Route::prefix('admin')->group(function () {

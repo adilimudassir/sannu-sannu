@@ -49,7 +49,7 @@ class EmailVerificationTest extends TestCase
 
         Event::assertDispatched(Verified::class);
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
-        $response->assertRedirect(route('global.dashboard') . '?verified=1');
+        $response->assertRedirect(route('dashboard') . '?verified=1');
     }
 
     public function test_email_verification_redirects_based_on_user_role(): void
@@ -66,7 +66,7 @@ class EmailVerificationTest extends TestCase
         );
 
         $response = $this->actingAs($contributor)->get($verificationUrl);
-        $response->assertRedirect(route('global.dashboard') . '?verified=1');
+        $response->assertRedirect(route('dashboard') . '?verified=1');
 
         // Test system admin redirect
         $systemAdmin = User::factory()->unverified()->create([
@@ -109,7 +109,7 @@ class EmailVerificationTest extends TestCase
 
         $response = $this->actingAs($user)->get('/verify-email');
 
-        $response->assertRedirect(route('global.dashboard'));
+        $response->assertRedirect(route('dashboard'));
     }
 
     public function test_verification_email_can_be_resent(): void

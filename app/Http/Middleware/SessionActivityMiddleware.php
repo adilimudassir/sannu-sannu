@@ -34,7 +34,7 @@ class SessionActivityMiddleware
         if ($this->sessionService->isSessionExpired($request)) {
             $this->sessionService->handleExpiredSession($request);
             
-            return redirect()->route('global.login')
+            return redirect()->route('login')
                 ->with('status', 'Your session has expired. Please log in again.');
         }
 

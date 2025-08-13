@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
 
         // Assign tenant-specific roles
         // Adil is tenant admin for tenant 1
-        $adil->tenantRoles()->create([
+        $john->tenantRoles()->create([
             'tenant_id' => 1,
             'role' => 'tenant_admin',
             'is_active' => true,
