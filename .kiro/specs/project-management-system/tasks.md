@@ -35,14 +35,14 @@ This implementation plan converts the Project Management System design into a se
     - Include file cleanup for unused images
     - _Requirements: 2.1-2.6_
 
-- [-]   5. Authorization Policies
+- [x]   5. Authorization Policies
     - Create ProjectPolicy with role-based permissions
     - Implement tenant admin and system admin authorization
     - Add cross-tenant access controls for system admins
     - Include project visibility and ownership checks
     - _Requirements: 6.1-6.8, 8.1-8.7_
 
-- [ ]   6. Request Validation Classes
+- [-]   6. Request Validation Classes
     - Create StoreProjectRequest with comprehensive validation rules
     - Create UpdateProjectRequest with conditional validation
     - Add SearchProjectsRequest for filtering and search

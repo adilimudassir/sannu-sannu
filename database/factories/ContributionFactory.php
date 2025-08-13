@@ -29,6 +29,7 @@ class ContributionFactory extends Factory
         $totalCommitted = $this->faker->randomFloat(2, 10, 500);
         
         return [
+            'tenant_id' => 1, // Will be overridden in tests
             'project_id' => 1, // Will be overridden in tests
             'user_id' => 1, // Will be overridden in tests
             'total_committed' => $totalCommitted,
