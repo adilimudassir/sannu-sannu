@@ -125,8 +125,12 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Check if the user is a tenant admin (in any tenant)
      */
-    public function isTenantAdmin(): bool
+    public function isTenantAdmin(?Tenant $tenant = null): bool
     {
+        if ($tenant) {
+            return $this->hasRoleInTenant(Role::TENANT_ADMIN, $tenant->id);
+        }
+        
         return $this->hasAnyTenantRole([Role::TENANT_ADMIN]);
     }
 
