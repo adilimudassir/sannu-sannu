@@ -16,8 +16,21 @@ class ProjectPolicy
      */
     public function viewAny(User $user): bool
     {
-        // All authenticated users can view projects (with visibility restrictions applied)
-        return true;
+        // System admins can view projects from any tenant
+        if ($user->isSystemAdmin()) {
+            return true;
+        }
+
+        // Check if user has access to the current tenant
+        $tenant = app('tenant');
+        if (!$tenant) {
+            return false;
+        }
+
+        // Users with tenant roles can view projects in their tenant
+        return $user->hasRoleInTenant(Role::TENANT_ADMIN, $tenant->id) ||
+               $user->hasRoleInTenant(Role::PROJECT_MANAGER, $tenant->id) ||
+               $user->hasRoleInTenant(Role::CONTRIBUTOR, $tenant->id);
     }
 
     /**

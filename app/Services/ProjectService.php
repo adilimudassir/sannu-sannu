@@ -113,7 +113,7 @@ class ProjectService
 
                 try {
                     $changes = array_diff_assoc($project->toArray(), $originalData);
-                    
+
                     $this->auditLogService::logAuthEvent(
                         'project_updated',
                         $user,
@@ -441,6 +441,11 @@ class ProjectService
      */
     private function applyFilters(Builder $query, array $filters): Builder
     {
+        // Search filter
+        if (!empty($filters['search'])) {
+            $query->search($filters['search']);
+        }
+
         // Status filter
         if (!empty($filters['status'])) {
             if (is_array($filters['status'])) {
@@ -488,7 +493,7 @@ class ProjectService
         // Sorting
         $sortBy = $filters['sort_by'] ?? 'created_at';
         $sortDirection = $filters['sort_direction'] ?? 'desc';
-        
+
         $allowedSortFields = ['created_at', 'updated_at', 'name', 'start_date', 'end_date', 'total_amount'];
         if (in_array($sortBy, $allowedSortFields)) {
             $query->orderBy($sortBy, $sortDirection);
@@ -506,7 +511,7 @@ class ProjectService
         if (isset($data['name']) && empty($data['name'])) {
             throw new InvalidArgumentException('Project name cannot be empty');
         }
-        
+
         if (!$existingProject && empty($data['name'])) {
             throw new InvalidArgumentException('Project name is required');
         }
@@ -514,7 +519,7 @@ class ProjectService
         if (isset($data['start_date']) && isset($data['end_date'])) {
             $startDate = is_string($data['start_date']) ? \Carbon\Carbon::parse($data['start_date']) : $data['start_date'];
             $endDate = is_string($data['end_date']) ? \Carbon\Carbon::parse($data['end_date']) : $data['end_date'];
-            
+
             if ($endDate <= $startDate) {
                 throw new InvalidArgumentException('End date must be after start date');
             }

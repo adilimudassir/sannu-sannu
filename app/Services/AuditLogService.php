@@ -228,4 +228,42 @@ class AuditLogService
 
         Log::warning('Profile: User account deleted', $logData);
     }
+
+    /**
+     * Log general audit events for system operations.
+     */
+    public function log(
+        string $action,
+        $model = null,
+        ?User $user = null,
+        array $additionalData = []
+    ): void {
+        $logData = [
+            'action' => $action,
+            'timestamp' => now()->toISOString(),
+            'ip_address' => request()?->ip(),
+            'user_agent' => request()?->userAgent(),
+            'session_id' => request()?->session()?->getId(),
+        ];
+
+        if ($user) {
+            $logData['user_id'] = $user->id;
+            $logData['user_email'] = $user->email;
+            $logData['user_role'] = $user->role->value ?? null;
+        }
+
+        if ($model) {
+            $logData['model_type'] = get_class($model);
+            $logData['model_id'] = $model->id ?? null;
+        }
+
+        // Merge additional data
+        $logData = array_merge($logData, $additionalData);
+
+        // Remove null values
+        $logData = array_filter($logData, fn($value) => $value !== null);
+
+        // Log the audit event
+        Log::info("Audit: {$action}", $logData);
+    }
 }

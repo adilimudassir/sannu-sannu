@@ -25,6 +25,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Project management routes
     Route::resource('projects', ProjectController::class);
     
+    // Additional project lifecycle routes
+    Route::patch('projects/{project}/activate', [ProjectController::class, 'activate'])
+        ->name('projects.activate');
+    Route::patch('projects/{project}/pause', [ProjectController::class, 'pause'])
+        ->name('projects.pause');
+    Route::patch('projects/{project}/complete', [ProjectController::class, 'complete'])
+        ->name('projects.complete');
+    
     // Project invitation routes (nested under projects)
     Route::resource('projects.invitations', ProjectInvitationController::class)
         ->shallow()
