@@ -490,7 +490,7 @@ export default function Dashboard({
                     You haven't joined any projects yet.
                   </CardDescription>
                   <Button asChild>
-                    <a href="/projects">Browse Projects</a>
+                    <a href="/projects">Projects</a>
                   </Button>
                 </CardContent>
               </Card>

@@ -231,7 +231,7 @@ class Project extends Model
             'total_contributors' => $totalContributions,
             'total_raised' => $totalRaised,
             'completion_percentage' => round($completionPercentage, 2),
-            'days_remaining' => $daysRemaining,
+            'days_remaining' => round($daysRemaining, 0),
             'average_contribution' => round($averageContribution, 2),
         ];
     }

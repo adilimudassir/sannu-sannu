@@ -1,6 +1,5 @@
 <?php
 
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,6 +36,13 @@ Route::middleware('guest')->group(function () {
         ->middleware('throttle:3,1')
         ->name('password.store');
 });
+
+// Redirect authenticated users away from auth pages
+// Route::middleware('auth')->group(function () {
+//     Route::get('login', fn () => redirect()->route('dashboard'));
+//     Route::get('register', fn () => redirect()->route('dashboard'));
+//     Route::get('forgot-password', fn () => redirect()->route('dashboard'));
+// });
 
 // Authenticated routes
 Route::middleware('auth')->group(function () {

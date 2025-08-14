@@ -8,7 +8,6 @@ use App\Models\Project;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -78,7 +77,7 @@ class ProjectService
                 'user_id' => $user->id,
             ]);
 
-            throw new RuntimeException('Failed to create project: ' . $e->getMessage());
+            throw new RuntimeException('Failed to create project: '.$e->getMessage());
         }
     }
 
@@ -108,7 +107,7 @@ class ProjectService
                     }
                 }
 
-                $filteredData = array_filter($data, fn($value) => $value !== null);
+                $filteredData = array_filter($data, fn ($value) => $value !== null);
                 $project->update($filteredData);
 
                 try {
@@ -147,7 +146,7 @@ class ProjectService
                 'user_id' => $user->id,
             ]);
 
-            throw new RuntimeException('Failed to update project: ' . $e->getMessage());
+            throw new RuntimeException('Failed to update project: '.$e->getMessage());
         }
     }
 
@@ -196,7 +195,7 @@ class ProjectService
                 'user_id' => $user->id,
             ]);
 
-            throw new RuntimeException('Failed to delete project: ' . $e->getMessage());
+            throw new RuntimeException('Failed to delete project: '.$e->getMessage());
         }
     }
 
@@ -236,7 +235,7 @@ class ProjectService
                 'user_id' => $user->id,
             ]);
 
-            throw new RuntimeException('Failed to activate project: ' . $e->getMessage());
+            throw new RuntimeException('Failed to activate project: '.$e->getMessage());
         }
     }
 
@@ -273,7 +272,7 @@ class ProjectService
                 'user_id' => $user->id,
             ]);
 
-            throw new RuntimeException('Failed to pause project: ' . $e->getMessage());
+            throw new RuntimeException('Failed to pause project: '.$e->getMessage());
         }
     }
 
@@ -282,7 +281,7 @@ class ProjectService
      */
     public function completeProject(Project $project, User $user): Project
     {
-        if (!in_array($project->status, [ProjectStatus::ACTIVE, ProjectStatus::PAUSED])) {
+        if (! in_array($project->status, [ProjectStatus::ACTIVE, ProjectStatus::PAUSED])) {
             throw new InvalidArgumentException('Only active or paused projects can be completed');
         }
 
@@ -311,14 +310,14 @@ class ProjectService
                 'user_id' => $user->id,
             ]);
 
-            throw new RuntimeException('Failed to complete project: ' . $e->getMessage());
+            throw new RuntimeException('Failed to complete project: '.$e->getMessage());
         }
     }
 
     /**
      * Cancel a project
      */
-    public function cancelProject(Project $project, User $user, string $reason = null): Project
+    public function cancelProject(Project $project, User $user, ?string $reason = null): Project
     {
         if ($project->status === ProjectStatus::COMPLETED || $project->status === ProjectStatus::CANCELLED) {
             throw new InvalidArgumentException('Cannot cancel completed or already cancelled projects');
@@ -355,7 +354,7 @@ class ProjectService
                 'user_id' => $user->id,
             ]);
 
-            throw new RuntimeException('Failed to cancel project: ' . $e->getMessage());
+            throw new RuntimeException('Failed to cancel project: '.$e->getMessage());
         }
     }
 
@@ -385,7 +384,16 @@ class ProjectService
 
         $query = $this->applyFilters($query, $filters);
 
-        return $query->paginate($filters['per_page'] ?? 15);
+        $projects = $query->paginate($filters['per_page'] ?? 15);
+
+        // Add statistics to each project
+        $projects->getCollection()->transform(function ($project) {
+            $project->statistics = $project->getStatistics();
+
+            return $project;
+        });
+
+        return $projects;
     }
 
     /**
@@ -398,17 +406,29 @@ class ProjectService
         // Apply tenant scope if provided
         if ($tenant) {
             $query->where('tenant_id', $tenant->id);
+        } else {
+            // For public search, only show publicly discoverable projects
+            $query->publiclyDiscoverable();
         }
 
         // Apply search
-        if (!empty($searchTerm)) {
+        if (! empty($searchTerm)) {
             $query->search($searchTerm);
         }
 
         // Apply filters
         $query = $this->applyFilters($query, $filters);
 
-        return $query->paginate($filters['per_page'] ?? 15);
+        $projects = $query->paginate($filters['per_page'] ?? 15);
+
+        // Add statistics to each project
+        $projects->getCollection()->transform(function ($project) {
+            $project->statistics = $project->getStatistics();
+
+            return $project;
+        });
+
+        return $projects;
     }
 
     /**
@@ -442,12 +462,12 @@ class ProjectService
     private function applyFilters(Builder $query, array $filters): Builder
     {
         // Search filter
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->search($filters['search']);
         }
 
         // Status filter
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             if (is_array($filters['status'])) {
                 $query->whereIn('status', $filters['status']);
             } else {
@@ -456,7 +476,7 @@ class ProjectService
         }
 
         // Visibility filter
-        if (!empty($filters['visibility'])) {
+        if (! empty($filters['visibility'])) {
             if (is_array($filters['visibility'])) {
                 $query->whereIn('visibility', $filters['visibility']);
             } else {
@@ -465,28 +485,28 @@ class ProjectService
         }
 
         // Tenant filter
-        if (!empty($filters['tenant_id'])) {
+        if (! empty($filters['tenant_id'])) {
             $query->where('tenant_id', $filters['tenant_id']);
         }
 
         // Amount range filter
-        if (!empty($filters['min_amount'])) {
+        if (! empty($filters['min_amount'])) {
             $query->where('total_amount', '>=', $filters['min_amount']);
         }
-        if (!empty($filters['max_amount'])) {
+        if (! empty($filters['max_amount'])) {
             $query->where('total_amount', '<=', $filters['max_amount']);
         }
 
         // Date range filter
-        if (!empty($filters['start_date'])) {
+        if (! empty($filters['start_date'])) {
             $query->where('start_date', '>=', $filters['start_date']);
         }
-        if (!empty($filters['end_date'])) {
+        if (! empty($filters['end_date'])) {
             $query->where('end_date', '<=', $filters['end_date']);
         }
 
         // Created by filter
-        if (!empty($filters['created_by'])) {
+        if (! empty($filters['created_by'])) {
             $query->where('created_by', $filters['created_by']);
         }
 
@@ -512,7 +532,7 @@ class ProjectService
             throw new InvalidArgumentException('Project name cannot be empty');
         }
 
-        if (!$existingProject && empty($data['name'])) {
+        if (! $existingProject && empty($data['name'])) {
             throw new InvalidArgumentException('Project name is required');
         }
 
@@ -538,7 +558,7 @@ class ProjectService
         }
 
         // Validate visibility
-        if (isset($data['visibility']) && !in_array($data['visibility'], ['public', 'private', 'invite_only'])) {
+        if (isset($data['visibility']) && ! in_array($data['visibility'], ['public', 'private', 'invite_only'])) {
             throw new InvalidArgumentException('Invalid visibility option');
         }
     }
@@ -556,7 +576,7 @@ class ProjectService
             throw new InvalidArgumentException('Project description is required for activation');
         }
 
-        if (!$project->start_date || !$project->end_date) {
+        if (! $project->start_date || ! $project->end_date) {
             throw new InvalidArgumentException('Start and end dates are required for activation');
         }
 
@@ -586,11 +606,11 @@ class ProjectService
                 $query->where('id', '!=', $excludeId);
             }
 
-            if (!$query->exists()) {
+            if (! $query->exists()) {
                 break;
             }
 
-            $slug = $baseSlug . '-' . $counter;
+            $slug = $baseSlug.'-'.$counter;
             $counter++;
         }
 

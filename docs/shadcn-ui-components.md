@@ -80,7 +80,7 @@ import { Button } from '@/Components/ui/button';
 
 // With Inertia.js Link
 <Button asChild>
-  <Link href="/projects">Browse Projects</Link>
+  <Link href="/projects">Projects</Link>
 </Button>
 ```
 
