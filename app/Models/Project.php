@@ -4,16 +4,16 @@ namespace App\Models;
 
 use App\Enums\ProjectStatus;
 use App\Enums\ProjectVisibility;
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Project extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'tenant_id',
@@ -215,16 +215,16 @@ class Project extends Model
     {
         $totalContributions = $this->contributions()->count();
         $totalRaised = $this->contributions()->sum('total_paid');
-        $completionPercentage = $this->total_amount > 0 
-            ? min(100, ($totalRaised / $this->total_amount) * 100) 
+        $completionPercentage = $this->total_amount > 0
+            ? min(100, ($totalRaised / $this->total_amount) * 100)
             : 0;
 
-        $daysRemaining = $this->end_date ? 
-            max(0, now()->diffInDays($this->end_date->toDateString(), false)) : 
+        $daysRemaining = $this->end_date ?
+            max(0, now()->diffInDays($this->end_date->toDateString(), false)) :
             null;
 
-        $averageContribution = $totalContributions > 0 ? 
-            $totalRaised / $totalContributions : 
+        $averageContribution = $totalContributions > 0 ?
+            $totalRaised / $totalContributions :
             0;
 
         return [
@@ -258,7 +258,7 @@ class Project extends Model
     public function scopePubliclyDiscoverable($query)
     {
         return $query->where('visibility', ProjectVisibility::PUBLIC)
-                    ->where('status', ProjectStatus::ACTIVE);
+            ->where('status', ProjectStatus::ACTIVE);
     }
 
     /**
@@ -276,7 +276,65 @@ class Project extends Model
     {
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'like', "%{$search}%")
-              ->orWhere('description', 'like', "%{$search}%");
+                ->orWhere('description', 'like', "%{$search}%");
         });
+    }
+
+    /**
+     * Get the route key for the model.
+     * Uses slug for public routes, id for authenticated routes
+     */
+    public function getRouteKeyName(): string
+    {
+        // For public routes, use slug
+        if (request()->is('projects/*') && ! request()->is('*/projects/*')) {
+            return 'slug';
+        }
+
+        // For tenant and admin routes, use id
+        return 'id';
+    }
+
+    /**
+     * Retrieve the model for a bound value.
+     * Handles both slug and id based routing
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        // If field is explicitly specified, use it
+        if ($field) {
+            return $this->where($field, $value)->first();
+        }
+
+        // For public routes using slug
+        if (request()->is('projects/*') && ! request()->is('*/projects/*')) {
+            return $this->where('slug', $value)
+                ->where('visibility', ProjectVisibility::PUBLIC)
+                ->where('status', ProjectStatus::ACTIVE)
+                ->first();
+        }
+
+        // For tenant routes, scope to current tenant
+        if (request()->route('tenant')) {
+            $tenantParam = request()->route('tenant');
+
+            // If tenant parameter is a string (slug), find the tenant
+            if (is_string($tenantParam)) {
+                $tenant = \App\Models\Tenant::where('slug', $tenantParam)->first();
+                if ($tenant) {
+                    return $this->where('id', $value)
+                        ->where('tenant_id', $tenant->id)
+                        ->first();
+                }
+            } elseif ($tenantParam instanceof \App\Models\Tenant) {
+                // If tenant parameter is already a model
+                return $this->where('id', $value)
+                    ->where('tenant_id', $tenantParam->id)
+                    ->first();
+            }
+        }
+
+        // For admin routes, no scoping needed (system admin can access all)
+        return $this->where('id', $value)->first();
     }
 }

@@ -8,7 +8,10 @@
       ],
       "disabled": false,
       "autoApprove": [
-        "browser-logs"
+        "browser-logs",
+        "tinker",
+        "list-routes",
+        "search-docs"
       ]
     }
   }
