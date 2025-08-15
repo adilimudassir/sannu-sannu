@@ -9,9 +9,10 @@ import { PaginatedData, Project } from '@/types';
 
 interface Props {
     projects: PaginatedData<Project>;
+    routePath: string;
 }
 
-export default function ProjectsGrid({ projects }: Props) {
+export default function ProjectsGrid({ projects, routePath }: Props) {
     return (
         <>
             {projects.data.length === 0 ? (
@@ -34,7 +35,7 @@ export default function ProjectsGrid({ projects }: Props) {
                                         <div className="flex-1">
                                             <CardTitle className="line-clamp-2 text-lg">
                                                 <Link
-                                                    href={route('public.projects.show', project.slug)}
+                                                    href={route(routePath, project.slug)}
                                                     className="transition-colors hover:text-primary"
                                                 >
                                                     {project.name}
@@ -103,7 +104,7 @@ export default function ProjectsGrid({ projects }: Props) {
                                     )}
 
                                     <Button asChild className="w-full">
-                                        <Link href={route('public.projects.show', project.slug)}>View Project</Link>
+                                        <Link href={route(routePath, project.slug)}>View Project</Link>
                                     </Button>
                                 </CardContent>
                             </Card>

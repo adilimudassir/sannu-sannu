@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Contributor\ProjectController;
+use App\Http\Controllers\SessionManagementController;
+use App\Http\Controllers\Settings\PasswordController;
+use App\Http\Controllers\Settings\ProfileController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 
@@ -18,26 +22,34 @@ Route::middleware('auth')->group(function () {
     Route::get('dashboard', fn() => Inertia::render('dashboard'))
         ->name('dashboard');
 
+    // Projects for contributors
+    Route::prefix('projects')->name('contributor.projects.')->group(function () {
+        Route::get('/', [ProjectController::class, 'index'])
+        ->name('index');
+    Route::get('/{project:slug}', [ProjectController::class, 'show'])
+        ->name('show');
+    });
+
     // Include user settings routes
     Route::group([
         'prefix' => 'settings',
     ], function () {
         Route::redirect('/', '/settings/profile');
-        Route::get('/profile', [App\Http\Controllers\Settings\ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [App\Http\Controllers\Settings\ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [App\Http\Controllers\Settings\ProfileController::class, 'destroy'])->name('profile.destroy');
-        Route::get('/password', [App\Http\Controllers\Settings\PasswordController::class, 'edit'])->name('password.edit');
-        Route::put('/password', [App\Http\Controllers\Settings\PasswordController::class, 'update'])
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::get('/password', [PasswordController::class, 'edit'])->name('password.edit');
+        Route::put('/password', [PasswordController::class, 'update'])
             ->middleware('throttle:6,1')
             ->name('password.update');
         Route::get('/appearance', fn() => Inertia::render('settings/appearance'))->name('appearance');
-        Route::get('/sessions', [App\Http\Controllers\SessionManagementController::class, 'index'])
+        Route::get('/sessions', [SessionManagementController::class, 'index'])
             ->name('sessions.index');
-        Route::delete('/sessions/{sessionId}', [App\Http\Controllers\SessionManagementController::class, 'destroy'])
+        Route::delete('/sessions/{sessionId}', [SessionManagementController::class, 'destroy'])
             ->name('sessions.destroy');
-        Route::post('/sessions/destroy-others', [App\Http\Controllers\SessionManagementController::class, 'destroyOthers'])
+        Route::post('/sessions/destroy-others', [SessionManagementController::class, 'destroyOthers'])
             ->name('sessions.destroy-others');
-        Route::post('/clear-tenant-context', [App\Http\Controllers\SessionManagementController::class, 'clearTenantContext'])
+        Route::post('/clear-tenant-context', [SessionManagementController::class, 'clearTenantContext'])
             ->name('sessions.clear-tenant-context');
     });
 });

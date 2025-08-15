@@ -22,7 +22,7 @@ Route::get('/', function () {
 })->name('home');
 
 // Public project discovery routes
-Route::prefix('projects')->name('public.projects.')->group(function () {
+Route::prefix('public/projects')->name('public.projects.')->group(function () {
     Route::get('/', [App\Http\Controllers\PublicProjectController::class, 'index'])->name('index');
     Route::get('/search', [App\Http\Controllers\PublicProjectController::class, 'search'])->name('search');
     Route::get('/{project:slug}', [App\Http\Controllers\PublicProjectController::class, 'show'])->name('show');

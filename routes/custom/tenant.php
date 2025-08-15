@@ -2,9 +2,9 @@
 
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\Tenant\ProjectController;
 use App\Http\Controllers\Settings\ProfileController;
-use App\Http\Controllers\ProjectInvitationController;
+use App\Http\Controllers\Tenant\ProjectInvitationController;
 use App\Http\Controllers\Settings\PasswordController;
 
 /*

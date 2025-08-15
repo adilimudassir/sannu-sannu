@@ -221,7 +221,7 @@ function getContributorNavigation(): NavigationConfig {
                 icon: LayoutGrid,
             },
             {
-                title: 'Discover Projects',
+                title: 'Projects',
                 href: '/projects',
                 icon: Globe,
             },
