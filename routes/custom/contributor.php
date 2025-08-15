@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
     // dashboard for contributors
-    Route::get('dashboard', fn() => Inertia::render('dashboard/global'))
+    Route::get('dashboard', fn() => Inertia::render('dashboard'))
         ->name('dashboard');
 
     // Include user settings routes

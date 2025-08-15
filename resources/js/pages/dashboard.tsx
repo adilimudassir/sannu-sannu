@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import DashboardRouter from '@/components/dashboard-router';
+import DashboardRouter from '@/components/role-based/dashboard-router';
 
 interface DashboardProps {
     // Props that might be passed from different dashboard controllers

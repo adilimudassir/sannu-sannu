@@ -2,7 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import ProjectForm from '@/pages/projects/form';
+import ProjectForm from '@/components/projects/form';
 import type { Project, Tenant } from '@/types';
 
 interface Props {

@@ -125,3 +125,32 @@ export interface Product {
     tenant?: Tenant;
     project?: Project;
 }
+
+export interface PaginatedData<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    links: Array<{
+        url?: string;
+        label: string;
+        active: boolean;
+    }>;
+}
+
+export interface ProjectFilters {
+    search?: string;
+    min_amount?: string;
+    max_amount?: string;
+    sort_by?: string;
+    sort_direction?: string;
+}
+
+export interface ProjectStatistics {
+    total_contributors: number;
+    total_raised: number;
+    completion_percentage: number;
+    days_remaining: number;
+    average_contribution: number;
+}

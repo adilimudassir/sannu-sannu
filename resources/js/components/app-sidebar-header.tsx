@@ -1,6 +1,6 @@
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
-import RoleBasedBreadcrumbs from '@/components/role-based-breadcrumbs';
+import RoleBasedBreadcrumbs from '@/components/role-based/role-based-breadcrumbs';
 
 export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
     return (
