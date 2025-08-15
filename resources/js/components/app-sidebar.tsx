@@ -2,6 +2,7 @@
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Role } from '@/enums';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { LayoutGrid, FolderOpen, Users, Settings, Globe, Building2, Shield } from 'lucide-react';
@@ -9,20 +10,30 @@ import AppLogo from './app-logo';
 
 export function AppSidebar() {
     const { auth } = usePage<SharedData>().props;
-    const user = auth.user;
+    const { user } = auth;
+
+    const getDashboardHref = () => {
+        if (user.is_system_admin) {
+            return '/admin/dashboard';
+        }
+        if (user.is_tenant_admin) {
+            return '/tenant/dashboard';
+        }
+        return '/dashboard';
+    };
 
     // Base navigation items for all authenticated users
     const baseNavItems: NavItem[] = [
-        {
-            title: 'Dashboard',
-            href: '/dashboard',
-            icon: LayoutGrid,
-        },
-        {
-            title: 'Projects',
-            href: '/projects',
-            icon: Globe,
-        },
+        // {
+        //     title: 'Dashboard',
+        //     href: getDashboardHref(),
+        //     icon: LayoutGrid,
+        // },
+        // {
+        //     title: 'Projects',
+        //     href: '/projects',
+        //     icon: Globe,
+        // },
     ];
 
     // Additional navigation items based on user roles
@@ -33,12 +44,12 @@ export function AppSidebar() {
         if (user.is_system_admin) {
             items.push(
                 {
-                    title: 'System Admin',
-                    href: '/admin',
+                    title: 'Dashboard',
+                    href: '/admin/dashboard',
                     icon: Shield,
                 },
                 {
-                    title: 'All Projects',
+                    title: 'Projects',
                     href: '/admin/projects',
                     icon: FolderOpen,
                 },
@@ -51,7 +62,7 @@ export function AppSidebar() {
                     title: 'Users',
                     href: '/admin/users',
                     icon: Users,
-                }
+                },
             );
         }
 
@@ -67,7 +78,7 @@ export function AppSidebar() {
                     title: 'Tenant Settings',
                     href: '/tenant/settings',
                     icon: Settings,
-                }
+                },
             );
         }
 
@@ -80,7 +91,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
+                            <Link href={getDashboardHref()} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

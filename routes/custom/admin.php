@@ -14,7 +14,7 @@ use App\Http\Controllers\Admin\ProjectController;
 |
 */
 
-Route::middleware('can:manage-platform')
+Route::middleware(['can:manage-platform', 'auth'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {

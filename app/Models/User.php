@@ -44,6 +44,16 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'is_system_admin',
+        'is_tenant_admin',
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -117,6 +127,11 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Check if the user is a system admin
      */
+    public function getIsSystemAdminAttribute(): bool
+    {
+        return $this->isSystemAdmin();
+    }
+
     public function isSystemAdmin(): bool
     {
         return $this->hasRole(Role::SYSTEM_ADMIN);
@@ -125,6 +140,11 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Check if the user is a tenant admin (in any tenant)
      */
+    public function getIsTenantAdminAttribute(): bool
+    {
+        return $this->isTenantAdmin();
+    }
+
     public function isTenantAdmin(?Tenant $tenant = null): bool
     {
         if ($tenant) {

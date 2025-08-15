@@ -1,8 +1,11 @@
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
+import { Role } from '@/enums';
+
 export interface Auth {
     user: User;
+    roles: Role[];
 }
 
 export interface BreadcrumbItem {
