@@ -83,13 +83,24 @@ export interface Project {
     description?: string;
     status: 'draft' | 'active' | 'paused' | 'completed' | 'cancelled';
     visibility: 'public' | 'private' | 'invite_only';
+    requires_approval?: boolean;
+    max_contributors?: number;
     total_amount: number;
+    minimum_contribution?: number;
+    payment_options?: string[];
+    installment_frequency?: 'monthly' | 'quarterly' | 'custom';
+    custom_installment_months?: number;
     start_date: string;
     end_date: string;
+    registration_deadline?: string;
+    created_by?: number;
+    managed_by?: number[];
+    settings?: Record<string, any>;
     created_at: string;
     updated_at: string;
     tenant?: Tenant;
     creator?: User;
+    products?: Product[];
     statistics?: {
         total_contributors: number;
         total_raised: number;
@@ -97,4 +108,20 @@ export interface Project {
         days_remaining: number;
         average_contribution: number;
     };
+}
+
+export interface Product {
+    id?: number;
+    tenant_id?: number;
+    project_id?: number;
+    name: string;
+    description?: string;
+    price: number;
+    image_url?: string;
+    image?: File;
+    sort_order: number;
+    created_at?: string;
+    updated_at?: string;
+    tenant?: Tenant;
+    project?: Project;
 }

@@ -1,65 +1,53 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Edit, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import ProjectForm from '@/pages/projects/form';
+import type { Project, Tenant } from '@/types';
 
-export default function AdminProjectEdit() {
+interface Props {
+    project: Project;
+    tenants: Tenant[];
+    errors?: Record<string, string>;
+}
+
+export default function AdminProjectEdit({ project, tenants, errors = {} }: Props) {
+    const handleSubmit = (data: any) => {
+        router.put(route('admin.projects.update', project.id), data);
+    };
+
+    const breadcrumbs = [
+        { title: 'Projects', href: route('admin.projects.index') },
+        { title: project.name, href: route('admin.projects.show', project.id) },
+        { title: 'Edit', href: '#' },
+    ];
+
     return (
-        <AppLayout>
-            <Head title="Edit Project - Admin" />
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title={`Edit ${project.name} - Admin`} />
             
             <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                    <Button variant="outline" size="sm" onClick={() => window.history.back()}>
-                        <ArrowLeft className="h-4 w-4 mr-2" />
-                        Back
+                    {/* Mobile back button */}
+                    <Button variant="outline" size="sm" asChild className="md:hidden">
+                        <Link href={route('admin.projects.show', project.id)}>
+                            <ArrowLeft className="h-4 w-4 mr-2" />
+                            Back
+                        </Link>
                     </Button>
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Edit Project</h1>
-                        <p className="text-muted-foreground">Modify project settings and configuration</p>
+                        <p className="text-muted-foreground">Modify {project.name} settings and configuration</p>
                     </div>
                 </div>
 
-                <Card className="max-w-2xl mx-auto">
-                    <CardHeader className="text-center">
-                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-                            <Edit className="h-8 w-8 text-muted-foreground" />
-                        </div>
-                        <CardTitle className="text-2xl">Feature Under Construction</CardTitle>
-                        <CardDescription className="text-base">
-                            The Project editing feature is currently being developed.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="text-center space-y-4">
-                        <p className="text-muted-foreground">
-                            This page will allow system administrators to:
-                        </p>
-                        <ul className="text-left space-y-2 max-w-md mx-auto">
-                            <li className="flex items-center gap-2">
-                                <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                                Edit project details and settings
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                                Update project goals and timelines
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                                Modify project visibility and access
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                                Transfer projects between organizations
-                            </li>
-                        </ul>
-                        <div className="pt-4">
-                            <Button variant="outline" onClick={() => window.history.back()}>
-                                Return to Projects
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
+                <ProjectForm
+                    project={project}
+                    tenants={tenants}
+                    isAdmin={true}
+                    onSubmit={handleSubmit}
+                    errors={errors}
+                />
             </div>
         </AppLayout>
     );

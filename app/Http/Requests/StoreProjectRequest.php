@@ -57,15 +57,13 @@ class StoreProjectRequest extends FormRequest
             'total_amount' => [
                 'required',
                 'numeric',
-                'min:0.01',
-                'max:999999.99',
+                'min:1',
                 'decimal:0,2',
             ],
             'minimum_contribution' => [
                 'nullable',
                 'numeric',
-                'min:0.01',
-                'max:999999.99',
+                'min:1',
                 'decimal:0,2',
                 'lte:total_amount',
             ],
@@ -146,8 +144,7 @@ class StoreProjectRequest extends FormRequest
             'products.*.price' => [
                 'required',
                 'numeric',
-                'min:0.01',
-                'max:999999.99',
+                'min:1.00',
                 'decimal:0,2',
             ],
             'products.*.image' => [
@@ -188,8 +185,7 @@ class StoreProjectRequest extends FormRequest
             'max_contributors.max' => 'Maximum contributors cannot exceed 10,000.',
 
             'total_amount.required' => 'A total contribution amount is required.',
-            'total_amount.min' => 'The total amount must be at least $0.01.',
-            'total_amount.max' => 'The total amount cannot exceed $999,999.99.',
+            'total_amount.min' => 'The total amount must be at least ₦1.00',
             'minimum_contribution.lte' => 'The minimum contribution cannot be greater than the total amount.',
 
             'payment_options.required' => 'Please select at least one payment option.',
@@ -213,8 +209,7 @@ class StoreProjectRequest extends FormRequest
             'products.*.name.required' => 'Each product must have a name.',
             'products.*.name.regex' => 'Product names may only contain letters, numbers, spaces, and common punctuation.',
             'products.*.price.required' => 'Each product must have a price.',
-            'products.*.price.min' => 'Product prices must be at least $0.01.',
-            'products.*.price.max' => 'Product prices cannot exceed $999,999.99.',
+            'products.*.price.min' => 'Product prices must be at least₦1.00',
             'products.*.image.image' => 'Product images must be valid image files.',
             'products.*.image.mimes' => 'Product images must be JPEG, JPG, PNG, or WebP format.',
             'products.*.image.max' => 'Product images cannot be larger than 2MB.',
