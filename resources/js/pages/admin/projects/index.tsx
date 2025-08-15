@@ -375,13 +375,13 @@ export default function AdminProjectIndex({ projects, filters, tenants }: Props)
 
     return (
         <AppLayout>
-            <Head title="All Projects - Admin" />
+            <Head title="Projects - Admin" />
 
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">All Projects</h1>
+                        <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
                         <p className="text-muted-foreground">Manage projects across all organizations</p>
                     </div>
                     <Button asChild>

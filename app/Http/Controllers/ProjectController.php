@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
-use App\Models\Project;
-use App\Models\Product;
-use Illuminate\Http\Request;
-use App\Services\ProjectService;
-use App\Services\ProductService;
+use App\Http\Requests\SearchProjectsRequest;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
-use App\Http\Requests\SearchProjectsRequest;
+use App\Models\Product;
+use App\Models\Project;
+use App\Services\ProductService;
+use App\Services\ProjectService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
 use Inertia\Response;
 use InvalidArgumentException;
 use RuntimeException;
@@ -33,12 +32,12 @@ class ProjectController extends Controller
     {
         $this->authorize('viewAny', Project::class);
 
-        $tenant = $request->tenant();
+        $tenant = app('tenant');
         $filters = $request->getFilters();
 
         $projects = $this->projectService->getTenantProjects($tenant, $filters);
 
-        return Inertia::render('projects/index', [
+        return Inertia::render('tenant/projects/index', [
             'projects' => $projects,
             'filters' => $filters,
             'tenant' => $tenant,
@@ -52,8 +51,8 @@ class ProjectController extends Controller
     {
         $this->authorize('create', Project::class);
 
-        return Inertia::render('projects/create', [
-            'tenant' => request()->tenant(),
+        return Inertia::render('tenant/projects/create', [
+            'tenant' => app('tenant'),
         ]);
     }
 
@@ -65,7 +64,7 @@ class ProjectController extends Controller
         $this->authorize('create', Project::class);
 
         try {
-            $tenant = $request->tenant();
+            $tenant = app('tenant');
             $user = $request->user();
 
             // Create the project
@@ -113,7 +112,7 @@ class ProjectController extends Controller
         // Get project statistics
         $statistics = $this->projectService->getProjectStatistics($project);
 
-        return Inertia::render('projects/show', [
+        return Inertia::render('tenant/projects/show', [
             'project' => $project,
             'statistics' => $statistics,
             'canEdit' => $this->canAuthorize('update', $project),
@@ -135,7 +134,7 @@ class ProjectController extends Controller
             $query->ordered();
         }]);
 
-        return Inertia::render('projects/edit', [
+        return Inertia::render('tenant/projects/edit', [
             'project' => $project,
             'tenant' => $project->tenant,
         ]);
@@ -309,7 +308,7 @@ class ProjectController extends Controller
         }
 
         // Handle product reordering if sort orders are provided
-        if (!empty($updatedProductIds)) {
+        if (! empty($updatedProductIds)) {
             $this->productService->reorderProducts($project, $updatedProductIds);
         }
     }
@@ -321,6 +320,7 @@ class ProjectController extends Controller
     {
         try {
             $this->authorize($ability, $arguments);
+
             return true;
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
             return false;
