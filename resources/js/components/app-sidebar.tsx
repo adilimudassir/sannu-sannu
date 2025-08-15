@@ -1,89 +1,27 @@
 
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
+import { TenantSwitcher } from '@/components/tenant-switcher';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { Role } from '@/enums';
-import { type NavItem, type SharedData } from '@/types';
+import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, FolderOpen, Users, Settings, Globe, Building2, Shield } from 'lucide-react';
 import AppLogo from './app-logo';
+import { getNavigationConfig } from '@/config/navigation';
+import { getDashboardRoute, hasRole } from '@/lib/roles';
+import { UserRole } from '@/enums';
 
 export function AppSidebar() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, tenant, availableTenants } = usePage<SharedData>().props;
     const { user } = auth;
+    
+    // Use tenant data from shared props instead of parsing URL
+    const tenantSlug = tenant?.slug;
+    
+    const dashboardHref = getDashboardRoute(user, tenantSlug);
+    const navigationConfig = getNavigationConfig(user, tenantSlug);
 
-    const getDashboardHref = () => {
-        if (user.is_system_admin) {
-            return '/admin/dashboard';
-        }
-        if (user.is_tenant_admin) {
-            return '/tenant/dashboard';
-        }
-        return '/dashboard';
-    };
-
-    // Base navigation items for all authenticated users
-    const baseNavItems: NavItem[] = [
-        // {
-        //     title: 'Dashboard',
-        //     href: getDashboardHref(),
-        //     icon: LayoutGrid,
-        // },
-        // {
-        //     title: 'Projects',
-        //     href: '/projects',
-        //     icon: Globe,
-        // },
-    ];
-
-    // Additional navigation items based on user roles
-    const getNavItems = (): NavItem[] => {
-        const items = [...baseNavItems];
-
-        // Check if user has system admin role
-        if (user.is_system_admin) {
-            items.push(
-                {
-                    title: 'Dashboard',
-                    href: '/admin/dashboard',
-                    icon: Shield,
-                },
-                {
-                    title: 'Projects',
-                    href: '/admin/projects',
-                    icon: FolderOpen,
-                },
-                {
-                    title: 'Tenants',
-                    href: '/admin/tenants',
-                    icon: Building2,
-                },
-                {
-                    title: 'Users',
-                    href: '/admin/users',
-                    icon: Users,
-                },
-            );
-        }
-
-        // Check if user has tenant admin role
-        if (user.is_tenant_admin) {
-            items.push(
-                {
-                    title: 'My Projects',
-                    href: '/tenant/projects',
-                    icon: FolderOpen,
-                },
-                {
-                    title: 'Tenant Settings',
-                    href: '/tenant/settings',
-                    icon: Settings,
-                },
-            );
-        }
-
-        return items;
-    };
+    // Show tenant switcher only for tenant admins (not system admins)
+    const showTenantSwitcher = hasRole(user, UserRole.TENANT_ADMIN) && !hasRole(user, UserRole.SYSTEM_ADMIN);
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -91,16 +29,24 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={getDashboardHref()} prefetch>
+                            <Link href={dashboardHref} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
+                    {showTenantSwitcher && (
+                        <SidebarMenuItem>
+                            <TenantSwitcher 
+                                availableTenants={availableTenants || []}
+                                className="w-full"
+                            />
+                        </SidebarMenuItem>
+                    )}
                 </SidebarMenu>
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={getNavItems()} />
+                <NavMain items={navigationConfig.main} />
             </SidebarContent>
 
             <SidebarFooter>

@@ -1,35 +1,56 @@
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import SystemAdminDashboard from '@/pages/dashboard/system-admin';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
-];
+interface AdminDashboardProps {
+    stats?: {
+        total_tenants: number;
+        total_users: number;
+        total_projects: number;
+        active_projects: number;
+        total_contributions: number;
+        platform_revenue: number;
+    };
+    recent_tenants?: Array<{
+        id: number;
+        name: string;
+        slug: string;
+        created_at: string;
+        projects_count: number;
+        users_count: number;
+    }>;
+    recent_projects?: Array<{
+        id: number;
+        name: string;
+        tenant_name: string;
+        status: string;
+        total_amount: number;
+        current_amount: number;
+        created_at: string;
+    }>;
+    alerts?: Array<{
+        id: number;
+        type: 'warning' | 'error' | 'info';
+        message: string;
+        created_at: string;
+    }>;
+}
 
-export default function Dashboard() {
+export default function AdminDashboard(props: AdminDashboardProps) {
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
-                </div>
-                <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                </div>
-            </div>
+        <AppLayout>
+            <SystemAdminDashboard
+                stats={props.stats || {
+                    total_tenants: 0,
+                    total_users: 0,
+                    total_projects: 0,
+                    active_projects: 0,
+                    total_contributions: 0,
+                    platform_revenue: 0,
+                }}
+                recent_tenants={props.recent_tenants || []}
+                recent_projects={props.recent_projects || []}
+                alerts={props.alerts || []}
+            />
         </AppLayout>
     );
 }

@@ -39,14 +39,23 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $user = $request->user();
+        $availableTenants = [];
+
+        // Get available tenants for tenant admin users
+        if ($user && ($user->isSystemAdmin() || $user->hasAnyTenantRole())) {
+            $availableTenants = $user->getAvailableTenants();
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
             'tenant' => \App\Services\TenantService::getContextForFrontend(),
+            'availableTenants' => $availableTenants,
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),

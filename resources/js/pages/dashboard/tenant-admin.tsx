@@ -51,9 +51,17 @@ interface TenantAdminDashboardProps {
 
 export default function TenantAdminDashboard({ 
     tenant,
-    stats, 
-    recent_projects, 
-    top_contributors 
+    stats = {
+        total_projects: 0,
+        active_projects: 0,
+        draft_projects: 0,
+        completed_projects: 0,
+        total_contributors: 0,
+        total_raised: 0,
+        total_target: 0,
+    }, 
+    recent_projects = [], 
+    top_contributors = [] 
 }: TenantAdminDashboardProps) {
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-US', {

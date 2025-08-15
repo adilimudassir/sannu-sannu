@@ -96,14 +96,14 @@ export default function ProjectFiltersComponent({
           <div>
             <label className="block text-sm font-medium mb-1">Status</label>
             <Select
-              value={filters.status || ''}
-              onValueChange={(value) => onFilterChange('status', value)}
+              value={filters.status || 'all_statuses'}
+              onValueChange={(value) => onFilterChange('status', value === 'all_statuses' ? '' : value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="All statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All statuses</SelectItem>
+                <SelectItem value="all_statuses">All statuses</SelectItem>
                 <SelectItem value="draft">📝 Draft</SelectItem>
                 <SelectItem value="active">🟢 Active</SelectItem>
                 <SelectItem value="paused">⏸️ Paused</SelectItem>
@@ -116,14 +116,14 @@ export default function ProjectFiltersComponent({
           <div>
             <label className="block text-sm font-medium mb-1">Visibility</label>
             <Select
-              value={filters.visibility || ''}
-              onValueChange={(value) => onFilterChange('visibility', value)}
+              value={filters.visibility || 'all_visibility'}
+              onValueChange={(value) => onFilterChange('visibility', value === 'all_visibility' ? '' : value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="All visibility" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All visibility</SelectItem>
+                <SelectItem value="all_visibility">All visibility</SelectItem>
                 <SelectItem value="public">🌐 Public</SelectItem>
                 <SelectItem value="private">🔒 Private</SelectItem>
                 <SelectItem value="invite_only">👥 Invite Only</SelectItem>
@@ -135,14 +135,14 @@ export default function ProjectFiltersComponent({
             <div>
               <label className="block text-sm font-medium mb-1">Organization</label>
               <Select
-                value={filters.tenant_id || ''}
-                onValueChange={(value) => onFilterChange('tenant_id', value)}
+                value={filters.tenant_id || 'all_tenants'}
+                onValueChange={(value) => onFilterChange('tenant_id', value === 'all_tenants' ? '' : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All organizations" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All organizations</SelectItem>
+                  <SelectItem value="all_tenants">All organizations</SelectItem>
                   {tenants.map((tenant) => (
                     <SelectItem key={tenant.id} value={tenant.id.toString()}>
                       {tenant.name}

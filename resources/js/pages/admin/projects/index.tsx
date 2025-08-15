@@ -11,7 +11,23 @@ import {
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import { ArrowUpDown, Calendar, ChevronDown, DollarSign, Eye, Globe, Lock, MoreHorizontal, Plus, UserPlus, Users } from 'lucide-react';
+import {
+    ArrowUpDown,
+    Building2,
+    Calendar,
+    ChevronDown,
+    DollarSign,
+    Eye,
+    Filter,
+    Globe,
+    Lock,
+    MoreHorizontal,
+    Plus,
+    Search,
+    UserPlus,
+    Users,
+    X,
+} from 'lucide-react';
 import { useState } from 'react';
 
 import { ProjectStatusBadge } from '@/components/projects';
@@ -26,6 +42,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency, formatDateShort } from '@/lib/formatters';
@@ -92,7 +110,7 @@ interface ProjectFilters {
 interface Props {
     projects: PaginatedData<Project>;
     filters: ProjectFilters;
-    tenant: Tenant;
+    tenants?: Tenant[];
 }
 
 const visibilityConfig = {
@@ -101,20 +119,67 @@ const visibilityConfig = {
     invite_only: { label: 'Invite Only', icon: UserPlus, color: 'text-blue-600' },
 };
 
-export default function TenantProjectIndex({ projects, filters, tenant }: Props) {
+export default function AdminProjectIndex({ projects, filters, tenants }: Props) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = useState({});
+    const [searchTerm, setSearchTerm] = useState(filters.search || '');
+    const [showFilters, setShowFilters] = useState(false);
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.get(
+            route('admin.projects.index'),
+            {
+                ...filters,
+                search: searchTerm,
+            },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
+
+    const handleFilterChange = (key: string, value: string) => {
+        router.get(
+            route('admin.projects.index'),
+            {
+                ...filters,
+                [key]: value || undefined,
+            },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
+
+    const clearFilters = () => {
+        setSearchTerm('');
+        router.get(
+            route('admin.projects.index'),
+            {},
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
 
     const columns: ColumnDef<Project>[] = [
         {
             accessorKey: 'name',
             header: ({ column }) => {
                 return (
-                    <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className="h-auto p-0 font-medium">
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                        className="-ml-4 h-auto p-0 pl-4 font-medium"
+                    >
                         Project Name
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                        <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
                     </Button>
                 );
             },
@@ -122,14 +187,29 @@ export default function TenantProjectIndex({ projects, filters, tenant }: Props)
                 const project = row.original;
                 return (
                     <div className="space-y-1">
-                        <Link
-                            href={route('tenant.projects.show', [tenant.slug, project.id])}
-                            className="font-medium text-primary hover:underline"
-                        >
+                        <Link href={route('admin.projects.show', project.id)} className="font-medium text-primary hover:underline">
                             {project.name}
                         </Link>
                         {project.description && <p className="line-clamp-2 text-sm text-muted-foreground">{project.description}</p>}
                     </div>
+                );
+            },
+        },
+        {
+            accessorKey: 'tenant',
+            header: 'Organization',
+            cell: ({ row }) => {
+                const tenant = row.original.tenant;
+                return tenant ? (
+                    <div className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        <div className="text-sm">
+                            <div className="font-medium">{tenant.name}</div>
+                            <div className="text-muted-foreground">@{tenant.slug}</div>
+                        </div>
+                    </div>
+                ) : (
+                    <span className="text-muted-foreground">-</span>
                 );
             },
         },
@@ -160,10 +240,14 @@ export default function TenantProjectIndex({ projects, filters, tenant }: Props)
             accessorKey: 'total_amount',
             header: ({ column }) => {
                 return (
-                    <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className="h-auto p-0 font-medium">
-                        <DollarSign className="mr-2 h-4 w-4" />
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                        className="-ml-4 h-auto p-0 pl-4 font-medium"
+                    >
+                        <DollarSign className="mr-2 h-4 w-4 opacity-50" />
                         Total Amount
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                        <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
                     </Button>
                 );
             },
@@ -197,10 +281,14 @@ export default function TenantProjectIndex({ projects, filters, tenant }: Props)
             accessorKey: 'end_date',
             header: ({ column }) => {
                 return (
-                    <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className="h-auto p-0 font-medium">
-                        <Calendar className="mr-2 h-4 w-4" />
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                        className="-ml-4 h-auto p-0 pl-4 font-medium"
+                    >
+                        <Calendar className="mr-2 h-4 w-4 opacity-50" />
                         End Date
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                        <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
                     </Button>
                 );
             },
@@ -219,7 +307,6 @@ export default function TenantProjectIndex({ projects, filters, tenant }: Props)
                 );
             },
         },
-
         {
             id: 'actions',
             enableHiding: false,
@@ -229,33 +316,35 @@ export default function TenantProjectIndex({ projects, filters, tenant }: Props)
                 return (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-muted">
                                 <span className="sr-only">Open menu</span>
                                 <MoreHorizontal className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem asChild>
-                                <Link href={route('tenant.projects.show', [tenant.slug, project.id])}>
+                                <Link href={route('admin.projects.show', project.id)} className="flex items-center">
                                     <Eye className="mr-2 h-4 w-4" />
                                     View Details
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href={route('tenant.projects.edit', [tenant.slug, project.id])}>
+                                <Link href={route('admin.projects.edit', project.id)} className="flex items-center">
+                                    <Building2 className="mr-2 h-4 w-4" />
                                     Edit Project
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                                className="text-destructive"
+                                className="text-destructive focus:text-destructive"
                                 onClick={() => {
                                     if (confirm('Are you sure you want to delete this project?')) {
-                                        router.delete(route('tenant.projects.destroy', [tenant.slug, project.id]));
+                                        router.delete(route('admin.projects.destroy', project.id));
                                     }
                                 }}
                             >
+                                <X className="mr-2 h-4 w-4" />
                                 Delete Project
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -284,31 +373,140 @@ export default function TenantProjectIndex({ projects, filters, tenant }: Props)
         },
     });
 
-
-
     return (
         <AppLayout>
-            <Head title={`Projects - ${tenant.name}`} />
+            <Head title="All Projects - Admin" />
 
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-                        <p className="text-muted-foreground">Manage your organization's contribution projects</p>
+                        <h1 className="text-3xl font-bold tracking-tight">All Projects</h1>
+                        <p className="text-muted-foreground">Manage projects across all organizations</p>
                     </div>
                     <Button asChild>
-                        <Link href={route('tenant.projects.create', tenant.slug)}>
+                        <Link href={route('admin.projects.create')}>
                             <Plus className="mr-2 h-4 w-4" />
                             New Project
                         </Link>
                     </Button>
                 </div>
 
-                {/* Filters and Search - Temporarily disabled */}
+                {/* Filters and Search */}
                 <Card>
-                    <CardContent className="p-6">
-                        <p className="text-muted-foreground">Filters temporarily disabled for debugging</p>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="text-lg">Search & Filter</CardTitle>
+                                <CardDescription>Find projects using search and filters</CardDescription>
+                            </div>
+                            {(searchTerm || Object.values(filters).some((v) => v)) && (
+                                <Button variant="outline" size="sm" onClick={clearFilters} className="gap-2">
+                                    <X className="h-4 w-4" />
+                                    Clear All
+                                </Button>
+                            )}
+                        </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {/* Search */}
+                        <form onSubmit={handleSearch} className="flex gap-4">
+                            <div className="relative flex-1">
+                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+                                <Input
+                                    placeholder="Search projects..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-10"
+                                />
+                            </div>
+                            <Button type="submit">Search</Button>
+                            <Button type="button" variant="outline" onClick={() => setShowFilters(!showFilters)}>
+                                <Filter className="mr-2 h-4 w-4" />
+                                Filters
+                            </Button>
+                        </form>
+
+                        {/* Filters */}
+                        {showFilters && (
+                            <div className="grid grid-cols-1 gap-4 rounded-lg bg-muted/30 p-4 md:grid-cols-4">
+                                <div>
+                                    <label className="mb-1 block text-sm font-medium">Status</label>
+                                    <Select
+                                        value={filters.status || 'all_statuses'}
+                                        onValueChange={(value) => handleFilterChange('status', value === 'all_statuses' ? '' : value)}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="All statuses" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all_statuses">All statuses</SelectItem>
+                                            <SelectItem value="draft">📝 Draft</SelectItem>
+                                            <SelectItem value="active">🟢 Active</SelectItem>
+                                            <SelectItem value="paused">⏸️ Paused</SelectItem>
+                                            <SelectItem value="completed">✅ Completed</SelectItem>
+                                            <SelectItem value="cancelled">❌ Cancelled</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div>
+                                    <label className="mb-1 block text-sm font-medium">Visibility</label>
+                                    <Select
+                                        value={filters.visibility || 'all_visibility'}
+                                        onValueChange={(value) => handleFilterChange('visibility', value === 'all_visibility' ? '' : value)}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="All visibility" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all_visibility">All visibility</SelectItem>
+                                            <SelectItem value="public">🌐 Public</SelectItem>
+                                            <SelectItem value="private">🔒 Private</SelectItem>
+                                            <SelectItem value="invite_only">👥 Invite Only</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {tenants && tenants.length > 0 && (
+                                    <div>
+                                        <label className="mb-1 block text-sm font-medium">Organization</label>
+                                        <Select
+                                            value={filters.tenant_id || 'all_tenants'}
+                                            onValueChange={(value) => handleFilterChange('tenant_id', value === 'all_tenants' ? '' : value)}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="All organizations" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all_tenants">All organizations</SelectItem>
+                                                {tenants.map((tenant) => (
+                                                    <SelectItem key={tenant.id} value={tenant.id.toString()}>
+                                                        {tenant.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label className="mb-1 block text-sm font-medium">Sort By</label>
+                                    <Select value={filters.sort_by || 'created_at'} onValueChange={(value) => handleFilterChange('sort_by', value)}>
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="created_at">Created Date</SelectItem>
+                                            <SelectItem value="name">Name</SelectItem>
+                                            <SelectItem value="total_amount">Amount</SelectItem>
+                                            <SelectItem value="end_date">End Date</SelectItem>
+                                            <SelectItem value="status">Status</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
 
@@ -381,11 +579,9 @@ export default function TenantProjectIndex({ projects, filters, tenant }: Props)
                                                 <div className="flex flex-col items-center justify-center space-y-2">
                                                     <div className="text-4xl text-muted-foreground">📋</div>
                                                     <div className="text-lg font-medium">No projects found</div>
-                                                    <div className="text-muted-foreground">
-                                                        Get started by creating your first project
-                                                    </div>
+                                                    <div className="text-muted-foreground">Get started by creating your first project</div>
                                                     <Button asChild className="mt-4">
-                                                        <Link href={route('tenant.projects.create', tenant.slug)}>
+                                                        <Link href={route('admin.projects.create')}>
                                                             <Plus className="mr-2 h-4 w-4" />
                                                             Create Project
                                                         </Link>

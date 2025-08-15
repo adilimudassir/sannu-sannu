@@ -16,21 +16,21 @@ class UserSeeder extends Seeder
         // Create global users (contributors by default)
         $adil = User::create([
             'name' => 'Adil Imudassir',
-            'email' => 'adil.imudassir@sannu-sannu.com',
+            'email' => 'adil@sannu-sannu.com',
             'password' => Hash::make('password'),
             'role' => 'contributor', // Global role
         ]);
 
         $john = User::create([
             'name' => 'John Doe',
-            'email' => 'john.doe@example.com',
+            'email' => 'john@example.com',
             'password' => Hash::make('password'),
             'role' => 'contributor', // Global role
         ]);
 
         $jane = User::create([
             'name' => 'Jane Doe',
-            'email' => 'jane.doe@example.com',
+            'email' => 'jane@example.com',
             'password' => Hash::make('password'),
             'role' => 'contributor', // Global role
         ]);

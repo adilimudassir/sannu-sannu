@@ -39,7 +39,19 @@ interface SystemAdminDashboardProps {
     }>;
 }
 
-export default function SystemAdminDashboard({ stats, recent_tenants, recent_projects, alerts }: SystemAdminDashboardProps) {
+export default function SystemAdminDashboard({ 
+    stats = {
+        total_tenants: 0,
+        total_users: 0,
+        total_projects: 0,
+        active_projects: 0,
+        total_contributions: 0,
+        platform_revenue: 0,
+    }, 
+    recent_tenants = [], 
+    recent_projects = [], 
+    alerts = [] 
+}: SystemAdminDashboardProps) {
 
 
     return (

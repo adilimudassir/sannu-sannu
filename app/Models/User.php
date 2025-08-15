@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use App\Enums\Role;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -150,7 +150,7 @@ class User extends Authenticatable implements MustVerifyEmail
         if ($tenant) {
             return $this->hasRoleInTenant(Role::TENANT_ADMIN, $tenant->id);
         }
-        
+
         return $this->hasAnyTenantRole([Role::TENANT_ADMIN]);
     }
 
@@ -208,11 +208,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function hasAnyTenantRole(?array $roles = null): bool
     {
         $query = $this->tenantRoles()->active();
-        
+
         if ($roles) {
             $query->whereIn('role', $roles);
         }
-        
+
         return $query->exists();
     }
 
@@ -257,6 +257,46 @@ class User extends Authenticatable implements MustVerifyEmail
     public function needsTenantSelection(): bool
     {
         return $this->hasAnyTenantRole([Role::TENANT_ADMIN, Role::PROJECT_MANAGER]);
+    }
+
+    /**
+     * Get all available tenants for this user (for tenant switching)
+     */
+    public function getAvailableTenants(): array
+    {
+        if ($this->isSystemAdmin()) {
+            // System admins can access all active tenants
+            return Tenant::where('is_active', true)
+                ->orderBy('name')
+                ->get()
+                ->map(function ($tenant) {
+                    return [
+                        'id' => $tenant->id,
+                        'name' => $tenant->name,
+                        'slug' => $tenant->slug,
+                        'role' => 'system_admin',
+                        'created_at' => $tenant->created_at,
+                        'updated_at' => $tenant->updated_at,
+                    ];
+                })
+                ->toArray();
+        }
+
+        // For other users, get tenants where they have roles
+        return $this->tenants()
+            ->orderBy('name')
+            ->get()
+            ->map(function ($tenant) {
+                return [
+                    'id' => $tenant->id,
+                    'name' => $tenant->name,
+                    'slug' => $tenant->slug,
+                    'role' => $tenant->pivot->role,
+                    'created_at' => $tenant->created_at,
+                    'updated_at' => $tenant->updated_at,
+                ];
+            })
+            ->toArray();
     }
 
     /**

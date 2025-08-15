@@ -7,7 +7,13 @@ interface AppContentProps extends React.ComponentProps<'main'> {
 
 export function AppContent({ variant = 'header', children, ...props }: AppContentProps) {
     if (variant === 'sidebar') {
-        return <SidebarInset className="bg-soft-ice" {...props}>{children}</SidebarInset>;
+        return (
+            <SidebarInset className="bg-soft-ice" {...props}>
+                <div className="flex h-full w-full flex-1 flex-col">
+                    {children}
+                </div>
+            </SidebarInset>
+        );
     }
 
     return (

@@ -11,7 +11,9 @@
         "browser-logs",
         "tinker",
         "list-routes",
-        "search-docs"
+        "search-docs",
+        "last-error",
+        "read-log-entries"
       ]
     }
   }

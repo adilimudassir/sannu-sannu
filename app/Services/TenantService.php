@@ -31,7 +31,7 @@ class TenantService
         return Cache::remember(
             "tenant.slug.{$slug}",
             now()->addMinutes(60),
-            fn() => Tenant::where('slug', $slug)
+            fn () => Tenant::where('slug', $slug)
                 ->where('is_active', true)
                 ->first()
         );
@@ -54,18 +54,18 @@ class TenantService
         $host = parse_url($baseUrl, PHP_URL_HOST);
         $scheme = parse_url($baseUrl, PHP_URL_SCHEME);
         $port = parse_url($baseUrl, PHP_URL_PORT);
-        
+
         // Build subdomain URL
-        $url = $scheme . '://' . $slug . '.' . $host;
-        
-        if ($port && !in_array($port, [80, 443])) {
-            $url .= ':' . $port;
+        $url = $scheme.'://'.$slug.'.'.$host;
+
+        if ($port && ! in_array($port, [80, 443])) {
+            $url .= ':'.$port;
         }
-        
+
         if ($path) {
-            $url .= '/' . ltrim($path, '/');
+            $url .= '/'.ltrim($path, '/');
         }
-        
+
         return $url;
     }
 
@@ -75,10 +75,14 @@ class TenantService
     public static function getContextForFrontend(): array
     {
         $tenant = self::current();
-        
-        if (!$tenant) {
+
+        if (! $tenant) {
             return [];
         }
+
+        // Get session service to check for tenant context
+        $sessionService = app(SessionService::class);
+        $tenantContext = $sessionService->getTenantContext(request());
 
         return [
             'id' => $tenant->id,
@@ -87,6 +91,8 @@ class TenantService
             'logo_url' => $tenant->logo_url,
             'primary_color' => $tenant->primary_color,
             'secondary_color' => $tenant->secondary_color,
+            'role' => $tenantContext['tenant_role'] ?? null,
+            'context_set_at' => $tenantContext['context_set_at'] ?? null,
         ];
     }
 
