@@ -114,7 +114,7 @@ class ProjectController extends Controller
         $statistics = $this->projectService->getProjectStatistics($project);
 
         return Inertia::render('tenant/projects/show', [
-            'project' => $project,
+            'project' => dd($project),
             'statistics' => $statistics,
             'canEdit' => $this->canAuthorize('update', $project),
             'canDelete' => $this->canAuthorize('delete', $project),

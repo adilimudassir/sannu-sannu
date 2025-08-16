@@ -98,31 +98,18 @@ This implementation plan converts the Project Management System design into a se
     - Include tenant selection for system admin users
     - _Requirements: 1.1, 1.2, 1.5, 1.6, 2.1-2.6, 8.2_
 
-- [ ]   13. Project Details Page Component
-    - Create resources/js/pages/projects/show.tsx
+- [x]   13. Project Details Page Components (Role-Based)
+    - Update resources/js/pages/admin/projects/show.tsx for system admin view
+    - Update resources/js/pages/tenant/projects/show.tsx for tenant admin view
+    - Update resources/js/pages/public/projects/show.tsx for public viewing
+    - Update resources/js/pages/contributor/projects/show.tsx for contributor view
     - Display project information with shadcn/ui Card components
     - Show project statistics and progress indicators
     - Include action buttons based on user permissions
     - Add product gallery with image display
     - _Requirements: 1.3, 1.4, 5.1-5.7_
 
-- [ ]   14. Public Projects Page Component
-    - Create resources/js/pages/public/projects.tsx
-    - Implement project browsing with search and filters
-    - Use shadcn/ui components for consistent styling
-    - Add project cards with key information display
-    - Include responsive design for mobile devices
-    - _Requirements: 4.1-4.7_
-
-- [ ]   15. Reusable Project Components
-    - Create resources/js/components/projects/project-card.tsx
-    - Implement resources/js/components/projects/product-manager.tsx
-    - Add resources/js/components/projects/status-badge.tsx using shadcn/ui Badge
-    - Create resources/js/components/projects/filters.tsx with shadcn/ui components
-    - Include proper TypeScript interfaces for all components
-    - _Requirements: 1.1-1.8, 2.1-2.6, 4.1-4.7_
-
-- [ ]   16. Image Upload and Management
+- [x]   16. Image Upload and Management
     - Implement file upload service for product images
     - Add image validation and processing
     - Create image storage and retrieval functionality
@@ -155,11 +142,13 @@ This implementation plan converts the Project Management System design into a se
     - _Requirements: 3.1-3.8_
 
 - [ ]   20. Integration Testing and Validation
-    - Test project CRUD operations across all user roles
-    - Validate authorization policies and access controls
-    - Test file upload and image management
+    - Test project CRUD operations across all user roles (admin, tenant, contributor, public)
+    - Validate authorization policies and access controls for each role-based directory
+    - Test file upload and image management functionality
     - Verify cross-tenant functionality for system admins
-    - Test public project discovery and search
+    - Test public project discovery and search functionality
+    - Validate proper routing and navigation between role-based project pages
+    - Test responsive design across all project page variants
     - _Requirements: All requirements validation_
 
 ## Technical Notes
@@ -175,10 +164,13 @@ This implementation plan converts the Project Management System design into a se
 
 ### Component Architecture
 
-- Use shadcn/ui components for consistent styling
+- Use shadcn/ui components for consistent styling across all role-based pages
 - Implement proper TypeScript interfaces for all props
 - Follow React best practices for state management
 - Include proper error boundaries and loading states
+- Maintain role-based page separation: admin/, tenant/, public/, contributor/
+- Share common components through resources/js/components/projects/
+- Ensure consistent user experience across different user roles
 
 ### Database Considerations
 

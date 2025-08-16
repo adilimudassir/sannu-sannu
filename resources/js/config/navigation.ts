@@ -61,7 +61,7 @@ function getSystemAdminNavigation(): NavigationConfig {
                 icon: Building2,
             },
             {
-                title: 'All Projects',
+                title: 'Projects',
                 href: '/admin/projects',
                 icon: FolderOpen,
             },

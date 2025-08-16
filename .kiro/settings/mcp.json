@@ -1,20 +1,56 @@
 {
-  "mcpServers": {
-    "laravel-boost": {
-      "command": "php",
-      "args": [
-        "./artisan",
-        "boost:mcp"
-      ],
-      "disabled": false,
-      "autoApprove": [
-        "browser-logs",
-        "tinker",
-        "list-routes",
-        "search-docs",
-        "last-error",
-        "read-log-entries"
-      ]
+    "mcpServers": {
+        "laravel-boost": {
+            "autoApprove": [
+                "browser-logs",
+                "tinker",
+                "list-routes",
+                "search-docs",
+                "list-available-config-keys",
+                "last-error",
+                "list-artisan-commands",
+                "database-schema",
+                "report-feedback",
+                "database-query",
+                "get-config",
+                "application-info",
+                "list-available-env-vars",
+                "get-absolute-url",
+                "read-log-entries",
+                "database-connections"
+            ],
+            "disabled": false,
+            "timeout": 60,
+            "command": "php",
+            "args": ["./artisan", "boost:mcp"],
+            "cwd": "/Users/adilimudassir/projects/sannu-sannu"
+        },
+        "github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking": {
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+            "disabled": false,
+            "autoApprove": ["sequentialthinking"]
+        },
+        "memory": {
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-memory"],
+            "autoApprove": [
+                "create_entities",
+                "create_relations",
+                "add_observations",
+                "delete_entities",
+                "delete_observations",
+                "delete_relations",
+                "read_graph",
+                "search_nodes",
+                "open_nodes"
+            ]
+        },
+        "github.com/upstash/context7-mcp": {
+            "command": "npx",
+            "args": ["-y", "@upstash/context7-mcp@latest"],
+            "disabled": false,
+            "autoApprove": ["resolve-library-id", "get-library-docs"]
+        }
     }
-  }
 }

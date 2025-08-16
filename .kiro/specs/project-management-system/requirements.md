@@ -51,7 +51,7 @@ The Project Management System is a core feature of the Sannu-Sannu platform that
 
 ### Requirement 4: Public Project Discovery
 
-**User Story:** As a contributor, I want to browse and discover public projects from all tenants so that I can find projects that interest me.
+**User Story:** As a contributor (authenticated user) or public user, I want to browse and discover public projects from all tenants so that I can find projects that interest me.
 
 #### Acceptance Criteria
 
@@ -107,7 +107,21 @@ The Project Management System is a core feature of the Sannu-Sannu platform that
 7. WHEN validating project data THEN the system SHALL ensure all required fields are completed before activation
 8. WHEN a system admin performs operations THEN the system SHALL allow bypassing certain validation rules with appropriate audit logging
 
-### Requirement 8: System Administrator Cross-Tenant Management
+### Requirement 8: Contributor Project Experience
+
+**User Story:** As an authenticated contributor, I want a dedicated interface to browse and track projects I'm interested in or participating in so that I can manage my contribution activities effectively.
+
+#### Acceptance Criteria
+
+1. WHEN a contributor accesses their project dashboard THEN the system SHALL display projects they are participating in or have contributed to
+2. WHEN a contributor browses available projects THEN the system SHALL show projects they have permission to view with contribution opportunities highlighted
+3. WHEN a contributor views project details THEN the system SHALL display their contribution history and current participation status
+4. WHEN a contributor searches for projects THEN the system SHALL filter based on their interests and contribution capacity
+5. WHEN a contributor tracks project progress THEN the system SHALL show personalized progress indicators and milestone updates
+6. WHEN a contributor manages their participation THEN the system SHALL provide interfaces to update contribution preferences and notification settings
+7. WHEN a contributor views project statistics THEN the system SHALL show their individual contribution impact and community engagement metrics
+
+### Requirement 9: System Administrator Cross-Tenant Management
 
 **User Story:** As a system administrator, I want full access to manage projects across all tenants so that I can provide platform-wide support and oversight.
 

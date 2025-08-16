@@ -1,11 +1,11 @@
-import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import ImageUpload from '@/components/ui/image-upload';
 import InputError from '@/components/input-error';
 import { formatCurrency } from '@/lib/formatters';
-import { Plus, X, Upload } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import type { Product } from '@/types';
 
 interface ProductManagerProps {
@@ -34,15 +34,20 @@ export default function ProductManager({ products, onChange, errors = {} }: Prod
         onChange(updatedProducts);
     };
 
-    const handleImageUpload = (index: number, file: File) => {
-        updateProduct(index, 'image', file);
-        
-        // Create preview URL
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            updateProduct(index, 'image_url', e.target?.result as string);
-        };
-        reader.readAsDataURL(file);
+    const handleImageUpload = (index: number, file: File | null) => {
+        if (file) {
+            updateProduct(index, 'image', file);
+            
+            // Create preview URL
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                updateProduct(index, 'image_url', e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            updateProduct(index, 'image', null);
+            updateProduct(index, 'image_url', null);
+        }
     };
 
     const totalAmount = products.reduce((sum, product) => sum + (product.price || 0), 0);
@@ -97,7 +102,7 @@ export default function ProductManager({ products, onChange, errors = {} }: Prod
 
 
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
                         <div className="space-y-2">
                             <Label htmlFor={`product_description_${index}`}>Description</Label>
                             <Textarea
@@ -105,54 +110,21 @@ export default function ProductManager({ products, onChange, errors = {} }: Prod
                                 value={product.description || ''}
                                 onChange={(e) => updateProduct(index, 'description', e.target.value)}
                                 placeholder="Product description"
-                                rows={3}
+                                rows={5}
+                                className="resize-none"
                             />
                             <InputError message={errors[`products.${index}.description`]} />
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor={`product_image_${index}`}>Image</Label>
-                            <div className="space-y-3">
-                                {product.image_url && (
-                                    <div className="flex justify-center">
-                                        <img
-                                            src={product.image_url}
-                                            alt={product.name}
-                                            className="h-24 w-24 object-cover rounded-lg border border-border shadow-sm"
-                                        />
-                                    </div>
-                                )}
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-center w-full">
-                                        <label
-                                            htmlFor={`product_image_${index}`}
-                                            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer bg-muted/30 hover:bg-muted/50 hover:border-primary/50 transition-all duration-200 group"
-                                        >
-                                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                                <Upload className="w-8 h-8 mb-2 text-muted-foreground group-hover:text-primary transition-colors" />
-                                                <p className="mb-2 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-                                                    <span className="font-semibold">Click to upload</span> or drag and drop
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">JPEG, PNG, or WebP (MAX. 2MB)</p>
-                                            </div>
-                                            <Input
-                                                id={`product_image_${index}`}
-                                                type="file"
-                                                accept="image/jpeg,image/jpg,image/png,image/webp"
-                                                className="hidden"
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file) {
-                                                        handleImageUpload(index, file);
-                                                    }
-                                                }}
-                                            />
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <InputError message={errors[`products.${index}.image`]} />
-                        </div>
+                        <ImageUpload
+                            id={`product_image_${index}`}
+                            label="Product Image"
+                            value={product.image || product.image_url}
+                            onChange={(file) => handleImageUpload(index, file)}
+                            maxSize={5}
+                            error={errors[`products.${index}.image`]}
+                            previewClassName="flex justify-center"
+                        />
                     </div>
                 </div>
             ))}

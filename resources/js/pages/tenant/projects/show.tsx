@@ -36,7 +36,7 @@ import {
 } from '@/components/ui/dialog';
 import { ProjectStatusBadge } from '@/components/projects';
 import { formatCurrency, formatDate, formatTimeRemaining, formatPercentage } from '@/lib/formatters';
-import { Project, Product, Tenant } from '@/types';
+import { Project, Product } from '@/types';
 
 interface ProjectDetailsProps {
   project: Project;

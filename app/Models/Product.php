@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Concerns\BelongsToTenant;
+use App\Services\ImageService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Product extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'tenant_id',
@@ -47,7 +48,7 @@ class Product extends Model
      */
     public function hasImage(): bool
     {
-        return !empty($this->image_url);
+        return ! empty($this->image_url);
     }
 
     /**
@@ -55,17 +56,11 @@ class Product extends Model
      */
     public function getImageUrl(): ?string
     {
-        if (!$this->hasImage()) {
+        if (! $this->hasImage()) {
             return null;
         }
 
-        // If it's already a full URL, return as is
-        if (filter_var($this->image_url, FILTER_VALIDATE_URL)) {
-            return $this->image_url;
-        }
-
-        // Otherwise, generate storage URL
-        return asset('storage/' . $this->image_url);
+        return app(ImageService::class)->getImageUrl($this->image_url);
     }
 
     /**

@@ -16,6 +16,38 @@ The Project Management System integrates with existing platform components:
 - **File Storage**: Integrates with Laravel Storage for product image management
 - **Audit System**: Leverages existing AuditLogService for operation tracking
 
+### Role-Based Architecture
+
+The system implements a role-based architecture with distinct user experiences:
+
+**System Administrators**
+
+- Access to all projects across all tenants via `/admin/projects/*`
+- Cross-tenant project management capabilities
+- Advanced analytics and reporting
+- Tenant selection in project creation/editing
+
+**Tenant Administrators**
+
+- Access to projects within their tenant context via `/{tenant}/projects/*`
+- Full CRUD operations for tenant-scoped projects
+- Product management and project lifecycle control
+- Tenant-specific analytics and reporting
+
+**Contributors (Authenticated Users)**
+
+- Browse and discover projects via `/contributor/projects/*`
+- View project details with contribution focus
+- Track participation and contribution history
+- Access to projects they have permission to view
+
+**Public Users (Unauthenticated)**
+
+- Browse public projects via `/projects/*`
+- Search and filter public project listings
+- View public project details
+- No access to private or invite-only projects
+
 ### Route Structure
 
 Following the established routing patterns:
@@ -42,6 +74,10 @@ Public Routes (Contributors):
 - GET /projects - Browse public projects
 - GET /projects/{project} - View public project details
 - GET /projects/search - Search projects
+
+Contributor Routes (Authenticated Contributors):
+- GET /contributor/projects - Browse projects as contributor
+- GET /contributor/projects/{project} - View project details as contributor
 ```
 
 ## Components and Interfaces
@@ -51,11 +87,12 @@ Public Routes (Contributors):
 #### Models
 
 **Project Model**
+
 ```php
 class Project extends Model
 {
     use BelongsToTenant;
-    
+
     protected $fillable = [
         'tenant_id',
         'name',
@@ -77,7 +114,7 @@ class Project extends Model
         'status',
         'settings'
     ];
-    
+
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
@@ -91,7 +128,7 @@ class Project extends Model
         'managed_by' => 'array',
         'settings' => 'array'
     ];
-    
+
     // Relationships
     public function tenant(): BelongsTo
     public function creator(): BelongsTo
@@ -103,6 +140,7 @@ class Project extends Model
 ```
 
 **Product Model**
+
 ```php
 class Product extends Model
 {
@@ -115,12 +153,12 @@ class Product extends Model
         'image_url',
         'sort_order'
     ];
-    
+
     protected $casts = [
         'price' => 'decimal:2',
         'sort_order' => 'integer'
     ];
-    
+
     // Relationships
     public function tenant(): BelongsTo
     public function project(): BelongsTo
@@ -130,6 +168,7 @@ class Product extends Model
 #### Enums
 
 **ProjectStatus Enum**
+
 ```php
 enum ProjectStatus: string
 {
@@ -142,6 +181,7 @@ enum ProjectStatus: string
 ```
 
 **ProjectVisibility Enum**
+
 ```php
 enum ProjectVisibility: string
 {
@@ -154,6 +194,7 @@ enum ProjectVisibility: string
 #### Services
 
 **ProjectService**
+
 ```php
 class ProjectService
 {
@@ -171,6 +212,7 @@ class ProjectService
 ```
 
 **ProductService**
+
 ```php
 class ProductService
 {
@@ -186,6 +228,7 @@ class ProductService
 #### Controllers
 
 **ProjectController** (Tenant Routes)
+
 ```php
 class ProjectController extends Controller
 {
@@ -193,7 +236,7 @@ class ProjectController extends Controller
         private ProjectService $projectService,
         private ProductService $productService
     ) {}
-    
+
     public function index(Request $request): Response
     public function create(): Response
     public function store(StoreProjectRequest $request): RedirectResponse
@@ -205,6 +248,7 @@ class ProjectController extends Controller
 ```
 
 **Admin\ProjectController** (System Admin Routes)
+
 ```php
 class Admin\ProjectController extends Controller
 {
@@ -219,6 +263,7 @@ class Admin\ProjectController extends Controller
 ```
 
 **PublicProjectController** (Public Routes)
+
 ```php
 class PublicProjectController extends Controller
 {
@@ -231,6 +276,7 @@ class PublicProjectController extends Controller
 #### Request Classes
 
 **StoreProjectRequest**
+
 ```php
 class StoreProjectRequest extends FormRequest
 {
@@ -256,6 +302,7 @@ class StoreProjectRequest extends FormRequest
 #### Policies
 
 **ProjectPolicy**
+
 ```php
 class ProjectPolicy
 {
@@ -273,51 +320,54 @@ class ProjectPolicy
 
 #### Pages
 
-**Project List Page** (`resources/js/pages/projects/index.tsx`)
+**System Admin Project Pages**
+
+- **Project List Page** (`resources/js/pages/admin/projects/index.tsx`)
+- **Project Create Page** (`resources/js/pages/admin/projects/create.tsx`)
+- **Project Edit Page** (`resources/js/pages/admin/projects/edit.tsx`)
+- **Project Details Page** (`resources/js/pages/admin/projects/show.tsx`)
+
 ```tsx
-interface ProjectListProps {
+interface AdminProjectListProps {
     projects: PaginatedData<Project>;
     filters: ProjectFilters;
-    tenant?: Tenant;
+    tenants: Tenant[];
 }
 
-export default function ProjectList({ projects, filters, tenant }: ProjectListProps) {
-    // Project listing with filters, search, and pagination
-    // Different views for tenant admin vs system admin
+export default function AdminProjectList({ projects, filters, tenants }: AdminProjectListProps) {
+    // Cross-tenant project listing with tenant identification
+    // Advanced filtering and search capabilities
+    // System admin specific actions
 }
 ```
 
-**Project Create/Edit Page** (`resources/js/pages/projects/form.tsx`)
+**Tenant Admin Project Pages**
+
+- **Project List Page** (`resources/js/pages/tenant/projects/index.tsx`)
+- **Project Create Page** (`resources/js/pages/tenant/projects/create.tsx`)
+- **Project Edit Page** (`resources/js/pages/tenant/projects/edit.tsx`)
+- **Project Details Page** (`resources/js/pages/tenant/projects/show.tsx`)
+
 ```tsx
-interface ProjectFormProps {
-    project?: Project;
-    tenant?: Tenant;
-    tenants?: Tenant[]; // For system admin
+interface TenantProjectListProps {
+    projects: PaginatedData<Project>;
+    filters: ProjectFilters;
+    tenant: Tenant;
 }
 
-export default function ProjectForm({ project, tenant, tenants }: ProjectFormProps) {
-    // Project creation/editing form with product management
-    // Dynamic product addition/removal
-    // Image upload handling
-}
-```
-
-**Project Details Page** (`resources/js/pages/projects/show.tsx`)
-```tsx
-interface ProjectDetailsProps {
-    project: Project;
-    statistics: ProjectStatistics;
-    canEdit: boolean;
-}
-
-export default function ProjectDetails({ project, statistics, canEdit }: ProjectDetailsProps) {
-    // Project information display
-    // Statistics and analytics
-    // Action buttons based on permissions
+export default function TenantProjectList({ projects, filters, tenant }: TenantProjectListProps) {
+    // Tenant-scoped project listing
+    // Project management within tenant context
+    // Tenant admin specific actions
 }
 ```
 
-**Public Projects Page** (`resources/js/pages/public/projects.tsx`)
+**Public Project Pages**
+
+- **Project Browse Page** (`resources/js/pages/public/projects/index.tsx`)
+- **Project Search Page** (`resources/js/pages/public/projects/search.tsx`)
+- **Project Details Page** (`resources/js/pages/public/projects/show.tsx`)
+
 ```tsx
 interface PublicProjectsProps {
     projects: PaginatedData<Project>;
@@ -331,9 +381,28 @@ export default function PublicProjects({ projects, filters }: PublicProjectsProp
 }
 ```
 
+**Contributor Project Pages**
+
+- **Project List Page** (`resources/js/pages/contributor/projects/index.tsx`)
+- **Project Details Page** (`resources/js/pages/contributor/projects/show.tsx`)
+
+```tsx
+interface ContributorProjectListProps {
+    projects: PaginatedData<Project>;
+    filters: ProjectFilters;
+}
+
+export default function ContributorProjectList({ projects, filters }: ContributorProjectListProps) {
+    // Contributor view of available projects
+    // Focus on contribution opportunities
+    // Participation tracking
+}
+```
+
 #### Reusable Components
 
 **ProjectCard** (`resources/js/components/projects/project-card.tsx`)
+
 ```tsx
 interface ProjectCardProps {
     project: Project;
@@ -348,6 +417,7 @@ export default function ProjectCard({ project, showTenant, showActions }: Projec
 ```
 
 **ProductManager** (`resources/js/components/projects/product-manager.tsx`)
+
 ```tsx
 interface ProductManagerProps {
     products: Product[];
@@ -363,6 +433,7 @@ export default function ProductManager({ products, onChange, errors }: ProductMa
 ```
 
 **ProjectStatusBadge** (`resources/js/components/projects/status-badge.tsx`)
+
 ```tsx
 interface ProjectStatusBadgeProps {
     status: ProjectStatus;
@@ -375,6 +446,7 @@ export default function ProjectStatusBadge({ status, className }: ProjectStatusB
 ```
 
 **ProjectFilters** (`resources/js/components/projects/filters.tsx`)
+
 ```tsx
 interface ProjectFiltersProps {
     filters: ProjectFilters;
@@ -392,6 +464,7 @@ export default function ProjectFilters({ filters, onChange }: ProjectFiltersProp
 ### Database Schema
 
 **projects table**
+
 ```sql
 CREATE TABLE projects (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -446,6 +519,7 @@ CREATE TABLE projects (
 ```
 
 **products table**
+
 ```sql
 CREATE TABLE products (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

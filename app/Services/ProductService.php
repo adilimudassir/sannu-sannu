@@ -2,18 +2,21 @@
 
 namespace App\Services;
 
+use App\Models\Contribution;
 use App\Models\Product;
 use App\Models\Project;
-use App\Models\Contribution;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use RuntimeException;
 
 class ProductService
 {
+    public function __construct(
+        private ImageService $imageService
+    ) {}
+
     /**
      * Add a new product to a project
      */
@@ -144,20 +147,7 @@ class ProductService
      */
     public function uploadProductImage(UploadedFile $file): string
     {
-        // Validate file
-        $this->validateImageFile($file);
-
-        // Generate unique filename
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        
-        // Store in products directory
-        $path = $file->storeAs('products', $filename, 'public');
-
-        if (!$path) {
-            throw new RuntimeException('Failed to upload product image.');
-        }
-
-        return $path;
+        return $this->imageService->uploadProductImage($file);
     }
 
     /**
@@ -165,17 +155,15 @@ class ProductService
      */
     public function deleteProductImage(string $path): bool
     {
-        if (empty($path)) {
-            return false;
-        }
+        return $this->imageService->deleteImage($path);
+    }
 
-        // Extract path from full URL if needed
-        if (filter_var($path, FILTER_VALIDATE_URL)) {
-            $path = parse_url($path, PHP_URL_PATH);
-            $path = ltrim($path, '/storage/');
-        }
-
-        return Storage::disk('public')->delete($path);
+    /**
+     * Get the full URL for a product image
+     */
+    public function getProductImageUrl(?string $path): ?string
+    {
+        return $this->imageService->getImageUrl($path);
     }
 
     /**
@@ -202,19 +190,9 @@ class ProductService
      */
     public function cleanupUnusedImages(): int
     {
-        $cleanedCount = 0;
-        $allImages = Storage::disk('public')->files('products');
-        
-        foreach ($allImages as $imagePath) {
-            $exists = Product::where('image_url', $imagePath)->exists();
-            
-            if (!$exists) {
-                Storage::disk('public')->delete($imagePath);
-                $cleanedCount++;
-            }
-        }
-
-        return $cleanedCount;
+        return $this->imageService->cleanupUnusedImages('products', function ($imagePath) {
+            return Product::where('image_url', $imagePath)->exists();
+        });
     }
 
     /**
@@ -226,35 +204,13 @@ class ProductService
             throw new InvalidArgumentException('Product name is required.');
         }
 
-        if (!isset($data['price']) || !is_numeric($data['price']) || $data['price'] < 0) {
+        if (! isset($data['price']) || ! is_numeric($data['price']) || $data['price'] < 0) {
             throw new InvalidArgumentException('Product price must be a valid positive number.');
         }
 
         // Additional validation for updates
-        if ($product && isset($data['image']) && !($data['image'] instanceof UploadedFile)) {
+        if ($product && isset($data['image']) && ! ($data['image'] instanceof UploadedFile)) {
             throw new InvalidArgumentException('Invalid image file provided.');
-        }
-    }
-
-    /**
-     * Validate uploaded image file
-     */
-    private function validateImageFile(UploadedFile $file): void
-    {
-        // Check file size (max 2MB)
-        if ($file->getSize() > 2 * 1024 * 1024) {
-            throw new InvalidArgumentException('Image file size cannot exceed 2MB.');
-        }
-
-        // Check file type
-        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!in_array($file->getMimeType(), $allowedMimes)) {
-            throw new InvalidArgumentException('Image must be a JPEG, PNG, GIF, or WebP file.');
-        }
-
-        // Check if file is actually an image
-        if (!getimagesize($file->getPathname())) {
-            throw new InvalidArgumentException('Uploaded file is not a valid image.');
         }
     }
 
