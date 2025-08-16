@@ -114,12 +114,15 @@ class ProjectController extends Controller
         $statistics = $this->projectService->getProjectStatistics($project);
 
         return Inertia::render('tenant/projects/show', [
-            'project' => dd($project),
+            'project' => $project,
             'statistics' => $statistics,
             'canEdit' => $this->canAuthorize('update', $project),
             'canDelete' => $this->canAuthorize('delete', $project),
             'canActivate' => $this->canAuthorize('activate', $project),
             'canPause' => $this->canAuthorize('pause', $project),
+            'canResume' => $this->canAuthorize('resume', $project),
+            'canComplete' => $this->canAuthorize('complete', $project),
+            'canCancel' => $this->canAuthorize('cancel', $project),
         ]);
     }
 
@@ -255,7 +258,7 @@ class ProjectController extends Controller
      */
     public function complete(string $tenant, Project $project): RedirectResponse
     {
-        $this->authorize('update', $project);
+        $this->authorize('complete', $project);
 
         try {
             $user = request()->user();
@@ -270,6 +273,53 @@ class ProjectController extends Controller
         } catch (RuntimeException $e) {
             return back()
                 ->withErrors(['error' => 'Failed to complete project. Please try again.']);
+        }
+    }
+
+    /**
+     * Resume a paused project
+     */
+    public function resume(string $tenant, Project $project): RedirectResponse
+    {
+        $this->authorize('resume', $project);
+
+        try {
+            $user = request()->user();
+
+            $this->projectService->resumeProject($project, $user);
+
+            return back()
+                ->with('success', 'Project resumed successfully.');
+        } catch (InvalidArgumentException $e) {
+            return back()
+                ->withErrors(['error' => $e->getMessage()]);
+        } catch (RuntimeException $e) {
+            return back()
+                ->withErrors(['error' => 'Failed to resume project. Please try again.']);
+        }
+    }
+
+    /**
+     * Cancel a project
+     */
+    public function cancel(string $tenant, Project $project): RedirectResponse
+    {
+        $this->authorize('cancel', $project);
+
+        try {
+            $user = request()->user();
+            $reason = request()->input('reason');
+
+            $this->projectService->cancelProject($project, $user, $reason);
+
+            return back()
+                ->with('success', 'Project cancelled successfully.');
+        } catch (InvalidArgumentException $e) {
+            return back()
+                ->withErrors(['error' => $e->getMessage()]);
+        } catch (RuntimeException $e) {
+            return back()
+                ->withErrors(['error' => 'Failed to cancel project. Please try again.']);
         }
     }
 

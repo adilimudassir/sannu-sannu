@@ -86,7 +86,7 @@ enum ProjectStatus: string
      */
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::DRAFT => 'Draft',
             self::ACTIVE => 'Active',
             self::PAUSED => 'Paused',
@@ -100,12 +100,56 @@ enum ProjectStatus: string
      */
     public function cssClass(): string
     {
-        return match($this) {
+        return match ($this) {
             self::DRAFT => 'bg-gray-100 text-gray-800',
             self::ACTIVE => 'bg-green-100 text-green-800',
             self::PAUSED => 'bg-yellow-100 text-yellow-800',
             self::COMPLETED => 'bg-blue-100 text-blue-800',
             self::CANCELLED => 'bg-red-100 text-red-800',
+        };
+    }
+
+    /**
+     * Get valid transitions from this status
+     */
+    public function validTransitions(): array
+    {
+        return match ($this) {
+            self::DRAFT => [self::ACTIVE, self::CANCELLED],
+            self::ACTIVE => [self::PAUSED, self::COMPLETED, self::CANCELLED],
+            self::PAUSED => [self::ACTIVE, self::COMPLETED, self::CANCELLED],
+            self::COMPLETED => [], // No transitions from completed
+            self::CANCELLED => [], // No transitions from cancelled
+        };
+    }
+
+    /**
+     * Check if transition to another status is valid
+     */
+    public function canTransitionTo(ProjectStatus $newStatus): bool
+    {
+        return in_array($newStatus, $this->validTransitions());
+    }
+
+    /**
+     * Get the description for status transition
+     */
+    public function transitionDescription(ProjectStatus $newStatus): string
+    {
+        if (! $this->canTransitionTo($newStatus)) {
+            return "Invalid transition from {$this->label()} to {$newStatus->label()}";
+        }
+
+        return match ([$this, $newStatus]) {
+            [self::DRAFT, self::ACTIVE] => 'Activating project to accept contributions',
+            [self::DRAFT, self::CANCELLED] => 'Cancelling draft project',
+            [self::ACTIVE, self::PAUSED] => 'Pausing active project',
+            [self::ACTIVE, self::COMPLETED] => 'Completing active project',
+            [self::ACTIVE, self::CANCELLED] => 'Cancelling active project',
+            [self::PAUSED, self::ACTIVE] => 'Resuming paused project',
+            [self::PAUSED, self::COMPLETED] => 'Completing paused project',
+            [self::PAUSED, self::CANCELLED] => 'Cancelling paused project',
+            default => "Transitioning from {$this->label()} to {$newStatus->label()}",
         };
     }
 }

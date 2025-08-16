@@ -1,11 +1,11 @@
 <?php
 
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Tenant\ProjectController;
-use App\Http\Controllers\Settings\ProfileController;
-use App\Http\Controllers\Tenant\ProjectInvitationController;
 use App\Http\Controllers\Settings\PasswordController;
+use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Tenant\ProjectController;
+use App\Http\Controllers\Tenant\ProjectInvitationController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +28,6 @@ Route::get('/tenant-not-found', function () {
     ]);
 })->name('tenant.not-found');
 
-
 Route::middleware('auth')->group(function () {
     // Tenant selection for admin users
     Route::get('select-tenant', [App\Http\Controllers\TenantSelectionController::class, 'show'])
@@ -43,7 +42,7 @@ Route::middleware('auth')->group(function () {
         ->group(function () {
             Route::middleware(['auth', 'verified'])->group(function () {
                 // Tenant dashboard
-                Route::get('dashboard', fn() => Inertia::render('dashboard'))
+                Route::get('dashboard', fn () => Inertia::render('dashboard'))
                     ->name('dashboard');
 
                 // Project management routes
@@ -56,6 +55,10 @@ Route::middleware('auth')->group(function () {
                     ->name('projects.pause');
                 Route::patch('projects/{project}/complete', [ProjectController::class, 'complete'])
                     ->name('projects.complete');
+                Route::patch('projects/{project}/resume', [ProjectController::class, 'resume'])
+                    ->name('projects.resume');
+                Route::patch('projects/{project}/cancel', [ProjectController::class, 'cancel'])
+                    ->name('projects.cancel');
 
                 // Project invitation routes (nested under projects)
                 Route::resource('projects.invitations', ProjectInvitationController::class)
@@ -82,5 +85,3 @@ Route::middleware('auth')->group(function () {
             });
         });
 });
-
-

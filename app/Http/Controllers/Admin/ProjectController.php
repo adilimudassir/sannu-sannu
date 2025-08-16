@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Inertia\Inertia;
-use App\Models\Project;
-use App\Models\Product;
-use App\Models\Tenant;
-use Illuminate\Http\Request;
-use App\Services\ProjectService;
-use App\Services\ProductService;
-use App\Services\AuditLogService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SearchProjectsRequest;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
-use App\Http\Requests\SearchProjectsRequest;
+use App\Models\Product;
+use App\Models\Project;
+use App\Models\Tenant;
+use App\Services\AuditLogService;
+use App\Services\ProductService;
+use App\Services\ProjectService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
 use Inertia\Response;
 use InvalidArgumentException;
 use RuntimeException;
@@ -38,7 +37,7 @@ class ProjectController extends Controller
         $this->authorize('manage-platform');
 
         $filters = $request->getFilters();
-        
+
         // Get all projects across tenants for system admin
         $projects = $this->projectService->getAllProjects($filters);
 
@@ -80,15 +79,15 @@ class ProjectController extends Controller
 
         try {
             $user = $request->user();
-            
+
             // Get the selected tenant
             $tenantId = $request->input('tenant_id');
-            if (!$tenantId) {
+            if (! $tenantId) {
                 throw new InvalidArgumentException('Tenant selection is required for system admin project creation.');
             }
-            
+
             $tenant = Tenant::findOrFail($tenantId);
-            
+
             // Create the project
             $project = $this->projectService->createProject(
                 $request->getProjectData(),
@@ -114,13 +113,13 @@ class ProjectController extends Controller
                     'tenant_id' => $tenant->id,
                     'tenant_name' => $tenant->name,
                     'project_name' => $project->name,
-                    'admin_override' => true
+                    'admin_override' => true,
                 ]
             );
 
             return redirect()
                 ->route('admin.projects.show', ['project' => $project])
-                ->with('success', 'Project created successfully for tenant: ' . $tenant->name);
+                ->with('success', 'Project created successfully for tenant: '.$tenant->name);
 
         } catch (InvalidArgumentException $e) {
             return back()
@@ -155,6 +154,9 @@ class ProjectController extends Controller
             'canDelete' => true, // System admin can always delete
             'canActivate' => true, // System admin can always activate
             'canPause' => true, // System admin can always pause
+            'canResume' => true, // System admin can always resume
+            'canComplete' => true, // System admin can always complete
+            'canCancel' => true, // System admin can always cancel
         ]);
     }
 
@@ -198,7 +200,7 @@ class ProjectController extends Controller
                 $newTenant = Tenant::findOrFail($newTenantId);
                 $project->tenant_id = $newTenantId;
                 $project->save();
-                
+
                 // Log tenant change
                 $this->auditLogService->log(
                     'project_tenant_changed_by_admin',
@@ -208,7 +210,7 @@ class ProjectController extends Controller
                         'original_tenant_id' => $originalTenantId,
                         'new_tenant_id' => $newTenantId,
                         'new_tenant_name' => $newTenant->name,
-                        'admin_override' => true
+                        'admin_override' => true,
                     ]
                 );
             }
@@ -237,7 +239,7 @@ class ProjectController extends Controller
                     'tenant_id' => $project->tenant_id,
                     'tenant_name' => $project->tenant->name,
                     'project_name' => $project->name,
-                    'admin_override' => true
+                    'admin_override' => true,
                 ]
             );
 
@@ -267,7 +269,7 @@ class ProjectController extends Controller
             $user = request()->user();
             $tenantName = $project->tenant->name;
             $projectName = $project->name;
-            
+
             // Log before deletion
             $this->auditLogService->log(
                 'project_deleted_by_admin',
@@ -277,10 +279,10 @@ class ProjectController extends Controller
                     'tenant_id' => $project->tenant_id,
                     'tenant_name' => $tenantName,
                     'project_name' => $projectName,
-                    'admin_override' => true
+                    'admin_override' => true,
                 ]
             );
-            
+
             $this->projectService->deleteProject($project, $user);
 
             return redirect()
@@ -305,7 +307,7 @@ class ProjectController extends Controller
 
         try {
             $user = request()->user();
-            
+
             $this->projectService->activateProject($project, $user);
 
             // Log system admin action
@@ -317,7 +319,7 @@ class ProjectController extends Controller
                     'tenant_id' => $project->tenant_id,
                     'tenant_name' => $project->tenant->name,
                     'project_name' => $project->name,
-                    'admin_override' => true
+                    'admin_override' => true,
                 ]
             );
 
@@ -342,7 +344,7 @@ class ProjectController extends Controller
 
         try {
             $user = request()->user();
-            
+
             $this->projectService->pauseProject($project, $user);
 
             // Log system admin action
@@ -354,7 +356,7 @@ class ProjectController extends Controller
                     'tenant_id' => $project->tenant_id,
                     'tenant_name' => $project->tenant->name,
                     'project_name' => $project->name,
-                    'admin_override' => true
+                    'admin_override' => true,
                 ]
             );
 
@@ -379,7 +381,7 @@ class ProjectController extends Controller
 
         try {
             $user = request()->user();
-            
+
             $this->projectService->completeProject($project, $user);
 
             // Log system admin action
@@ -391,7 +393,7 @@ class ProjectController extends Controller
                     'tenant_id' => $project->tenant_id,
                     'tenant_name' => $project->tenant->name,
                     'project_name' => $project->name,
-                    'admin_override' => true
+                    'admin_override' => true,
                 ]
             );
 
@@ -404,6 +406,82 @@ class ProjectController extends Controller
         } catch (RuntimeException $e) {
             return back()
                 ->withErrors(['error' => 'Failed to complete project. Please try again.']);
+        }
+    }
+
+    /**
+     * Resume a paused project (System Admin Override)
+     */
+    public function resume(Project $project): RedirectResponse
+    {
+        $this->authorize('manage-platform');
+
+        try {
+            $user = request()->user();
+
+            $this->projectService->resumeProject($project, $user);
+
+            // Log system admin action
+            $this->auditLogService->log(
+                'project_resumed_by_admin',
+                $project,
+                $user,
+                [
+                    'tenant_id' => $project->tenant_id,
+                    'tenant_name' => $project->tenant->name,
+                    'project_name' => $project->name,
+                    'admin_override' => true,
+                ]
+            );
+
+            return back()
+                ->with('success', 'Project resumed successfully.');
+
+        } catch (InvalidArgumentException $e) {
+            return back()
+                ->withErrors(['error' => $e->getMessage()]);
+        } catch (RuntimeException $e) {
+            return back()
+                ->withErrors(['error' => 'Failed to resume project. Please try again.']);
+        }
+    }
+
+    /**
+     * Cancel a project (System Admin Override)
+     */
+    public function cancel(Project $project): RedirectResponse
+    {
+        $this->authorize('manage-platform');
+
+        try {
+            $user = request()->user();
+            $reason = request()->input('reason');
+
+            $this->projectService->cancelProject($project, $user, $reason);
+
+            // Log system admin action
+            $this->auditLogService->log(
+                'project_cancelled_by_admin',
+                $project,
+                $user,
+                [
+                    'tenant_id' => $project->tenant_id,
+                    'tenant_name' => $project->tenant->name,
+                    'project_name' => $project->name,
+                    'reason' => $reason,
+                    'admin_override' => true,
+                ]
+            );
+
+            return back()
+                ->with('success', 'Project cancelled successfully.');
+
+        } catch (InvalidArgumentException $e) {
+            return back()
+                ->withErrors(['error' => $e->getMessage()]);
+        } catch (RuntimeException $e) {
+            return back()
+                ->withErrors(['error' => 'Failed to cancel project. Please try again.']);
         }
     }
 
@@ -443,7 +521,7 @@ class ProjectController extends Controller
         }
 
         // Handle product reordering if sort orders are provided
-        if (!empty($updatedProductIds)) {
+        if (! empty($updatedProductIds)) {
             $this->productService->reorderProducts($project, $updatedProductIds);
         }
     }

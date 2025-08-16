@@ -22,11 +22,13 @@ import {
     Lock,
     Pause,
     Play,
+    RotateCcw,
     Target,
     Trash2,
     TrendingUp,
     UserCheck,
     Users,
+    X,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -43,10 +45,12 @@ interface ProjectDetailsProps {
     canDelete: boolean;
     canActivate: boolean;
     canPause: boolean;
+    canResume: boolean;
     canComplete: boolean;
+    canCancel: boolean;
 }
 
-export default function AdminProjectShow({ project, statistics, canEdit, canDelete, canActivate, canPause, canComplete }: ProjectDetailsProps) {
+export default function AdminProjectShow({ project, statistics, canEdit, canDelete, canActivate, canPause, canResume, canComplete, canCancel }: ProjectDetailsProps) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const stats = statistics || project.statistics;
     const isSystemAdmin = true;
@@ -70,7 +74,7 @@ export default function AdminProjectShow({ project, statistics, canEdit, canDele
         });
     };
 
-    const handleStatusChange = (action: 'activate' | 'pause' | 'complete') => {
+    const handleStatusChange = (action: 'activate' | 'pause' | 'resume' | 'complete' | 'cancel') => {
         const actionRoute = route(`admin.projects.${action}`, project.id);
 
         router.patch(actionRoute);
@@ -147,10 +151,28 @@ export default function AdminProjectShow({ project, statistics, canEdit, canDele
                             </Button>
                         )}
 
+                        {canResume && project.status === 'paused' && (
+                            <Button onClick={() => handleStatusChange('resume')} className="bg-green-600 hover:bg-green-700">
+                                <RotateCcw className="mr-2 h-4 w-4" />
+                                Resume
+                            </Button>
+                        )}
+
                         {canComplete && (project.status === 'active' || project.status === 'paused') && (
                             <Button onClick={() => handleStatusChange('complete')} className="bg-blue-600 hover:bg-blue-700">
                                 <CheckCircle className="mr-2 h-4 w-4" />
                                 Complete
+                            </Button>
+                        )}
+
+                        {canCancel && !['completed', 'cancelled'].includes(project.status) && (
+                            <Button 
+                                variant="outline"
+                                onClick={() => handleStatusChange('cancel')}
+                                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                            >
+                                <X className="mr-2 h-4 w-4" />
+                                Cancel
                             </Button>
                         )}
 

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { formatDateForInput } from '@/lib/date-utils';
 import type { Product, Project, Tenant } from '@/types';
 import { useForm } from '@inertiajs/react';
 import * as React from 'react';
@@ -54,9 +55,9 @@ export default function ProjectForm({ project, tenant, tenants = [], isAdmin = f
         payment_options: project?.payment_options || ['full'],
         installment_frequency: project?.installment_frequency || 'monthly',
         custom_installment_months: project?.custom_installment_months || undefined,
-        start_date: project?.start_date || '',
-        end_date: project?.end_date || '',
-        registration_deadline: project?.registration_deadline || '',
+        start_date: formatDateForInput(project?.start_date),
+        end_date: formatDateForInput(project?.end_date),
+        registration_deadline: formatDateForInput(project?.registration_deadline),
         managed_by: project?.managed_by || [],
         settings: project?.settings || {},
         products: project?.products || [{ name: '', description: '', price: 0, sort_order: 0 }],

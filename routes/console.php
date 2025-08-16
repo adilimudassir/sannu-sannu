@@ -14,3 +14,15 @@ Schedule::command('images:cleanup --force')
     ->sundays()
     ->at('02:00')
     ->description('Clean up unused product images');
+
+// Schedule project status updates to run daily
+Schedule::command('projects:update-statuses')
+    ->daily()
+    ->at('01:00')
+    ->description('Update project statuses based on dates (complete expired, activate scheduled)');
+
+// Schedule project status updates to run hourly during business hours for more responsive updates
+Schedule::command('projects:update-statuses')
+    ->hourly()
+    ->between('08:00', '18:00')
+    ->description('Hourly project status updates during business hours');

@@ -4,25 +4,24 @@ namespace Tests\Unit;
 
 use App\Enums\ProjectStatus;
 use App\Enums\ProjectVisibility;
+use App\Models\Contribution;
+use App\Models\Product;
 use App\Models\Project;
 use App\Models\Tenant;
 use App\Models\User;
-use App\Models\Product;
-use App\Models\Contribution;
 use App\Services\ProjectService;
-use App\Services\AuditLogService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
-use Tests\TestCase;
 use InvalidArgumentException;
-use RuntimeException;
+use Tests\TestCase;
 
 class ProjectServiceTest extends TestCase
 {
     use RefreshDatabase;
 
     private ProjectService $projectService;
+
     private Tenant $tenant;
+
     private User $user;
 
     protected function setUp(): void
@@ -182,12 +181,15 @@ class ProjectServiceTest extends TestCase
             'start_date' => now()->addDay(),
             'end_date' => now()->addMonth(),
             'total_amount' => 1000.00,
+            'payment_options' => ['full'],
+            'installment_frequency' => 'monthly',
         ]);
 
-        // Add at least one product
+        // Add at least one product with matching price
         Product::factory()->create([
             'project_id' => $project->id,
             'tenant_id' => $this->tenant->id,
+            'price' => 1000.00,
         ]);
 
         $activatedProject = $this->projectService->activateProject($project, $this->user);
@@ -238,7 +240,7 @@ class ProjectServiceTest extends TestCase
         ]);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Only active projects can be paused');
+        $this->expectExceptionMessage('Invalid transition from Draft to Paused');
 
         $this->projectService->pauseProject($project, $this->user);
     }

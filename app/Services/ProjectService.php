@@ -204,12 +204,8 @@ class ProjectService
      */
     public function activateProject(Project $project, User $user): Project
     {
-        if ($project->status !== ProjectStatus::DRAFT && $project->status !== ProjectStatus::PAUSED) {
-            throw new InvalidArgumentException('Only draft or paused projects can be activated');
-        }
-
-        // Validate project completeness
-        $this->validateProjectForActivation($project);
+        // Validate status transition
+        $this->validateStatusTransition($project, ProjectStatus::ACTIVE, $user);
 
         try {
             return DB::transaction(function () use ($project, $user) {
@@ -223,6 +219,7 @@ class ProjectService
                         'project_id' => $project->id,
                         'project_name' => $project->name,
                         'tenant_id' => $project->tenant_id,
+                        'previous_status' => $project->getOriginal('status'),
                     ]
                 );
 
@@ -244,9 +241,8 @@ class ProjectService
      */
     public function pauseProject(Project $project, User $user): Project
     {
-        if ($project->status !== ProjectStatus::ACTIVE) {
-            throw new InvalidArgumentException('Only active projects can be paused');
-        }
+        // Validate status transition
+        $this->validateStatusTransition($project, ProjectStatus::PAUSED, $user);
 
         try {
             return DB::transaction(function () use ($project, $user) {
@@ -260,6 +256,7 @@ class ProjectService
                         'project_id' => $project->id,
                         'project_name' => $project->name,
                         'tenant_id' => $project->tenant_id,
+                        'previous_status' => $project->getOriginal('status'),
                     ]
                 );
 
@@ -281,9 +278,8 @@ class ProjectService
      */
     public function completeProject(Project $project, User $user): Project
     {
-        if (! in_array($project->status, [ProjectStatus::ACTIVE, ProjectStatus::PAUSED])) {
-            throw new InvalidArgumentException('Only active or paused projects can be completed');
-        }
+        // Validate status transition
+        $this->validateStatusTransition($project, ProjectStatus::COMPLETED, $user);
 
         try {
             return DB::transaction(function () use ($project, $user) {
@@ -297,6 +293,7 @@ class ProjectService
                         'project_id' => $project->id,
                         'project_name' => $project->name,
                         'tenant_id' => $project->tenant_id,
+                        'previous_status' => $project->getOriginal('status'),
                         'statistics' => $project->getStatistics(),
                     ]
                 );
@@ -319,9 +316,8 @@ class ProjectService
      */
     public function cancelProject(Project $project, User $user, ?string $reason = null): Project
     {
-        if ($project->status === ProjectStatus::COMPLETED || $project->status === ProjectStatus::CANCELLED) {
-            throw new InvalidArgumentException('Cannot cancel completed or already cancelled projects');
-        }
+        // Validate status transition
+        $this->validateStatusTransition($project, ProjectStatus::CANCELLED, $user);
 
         try {
             return DB::transaction(function () use ($project, $user, $reason) {
@@ -330,6 +326,7 @@ class ProjectService
                     'settings' => array_merge($project->settings ?? [], [
                         'cancellation_reason' => $reason,
                         'cancelled_at' => now()->toISOString(),
+                        'cancelled_by' => $user->id,
                     ]),
                 ]);
 
@@ -341,6 +338,7 @@ class ProjectService
                         'project_id' => $project->id,
                         'project_name' => $project->name,
                         'tenant_id' => $project->tenant_id,
+                        'previous_status' => $project->getOriginal('status'),
                         'reason' => $reason,
                     ]
                 );
@@ -580,12 +578,57 @@ class ProjectService
             throw new InvalidArgumentException('Start and end dates are required for activation');
         }
 
+        // Validate date logic
+        if ($project->end_date <= $project->start_date) {
+            throw new InvalidArgumentException('End date must be after start date');
+        }
+
+        // Check if project has already ended
+        if ($project->end_date < now()->toDateString()) {
+            throw new InvalidArgumentException('Cannot activate project that has already ended');
+        }
+
+        // Validate products
         if ($project->products()->count() === 0) {
             throw new InvalidArgumentException('At least one product is required for activation');
         }
 
-        if ($project->total_amount <= 0) {
-            throw new InvalidArgumentException('Project must have a positive total amount for activation');
+        // Validate product pricing
+        $productTotal = $project->calculateTotalAmount();
+        if ($productTotal <= 0) {
+            throw new InvalidArgumentException('Project must have products with positive total amount for activation');
+        }
+
+        // Validate total amount matches product total
+        if ($project->total_amount > 0 && abs($project->total_amount - $productTotal) > 0.01) {
+            throw new InvalidArgumentException('Project total amount must match sum of product prices');
+        }
+
+        // Validate minimum contribution if set
+        if ($project->minimum_contribution && $project->minimum_contribution > $productTotal) {
+            throw new InvalidArgumentException('Minimum contribution cannot exceed total project amount');
+        }
+
+        // Validate payment options
+        if (empty($project->payment_options) || ! is_array($project->payment_options)) {
+            throw new InvalidArgumentException('At least one payment option must be specified');
+        }
+
+        // Validate installment settings if installments are allowed
+        if (in_array('installments', $project->payment_options)) {
+            if ($project->installment_frequency === 'custom' && ! $project->custom_installment_months) {
+                throw new InvalidArgumentException('Custom installment months must be specified when using custom frequency');
+            }
+        }
+
+        // Validate registration deadline if set
+        if ($project->registration_deadline && $project->registration_deadline >= $project->end_date) {
+            throw new InvalidArgumentException('Registration deadline must be before project end date');
+        }
+
+        // Validate max contributors if set
+        if ($project->max_contributors && $project->max_contributors < 1) {
+            throw new InvalidArgumentException('Maximum contributors must be at least 1');
         }
     }
 
@@ -618,6 +661,83 @@ class ProjectService
     }
 
     /**
+     * Resume a paused project
+     */
+    public function resumeProject(Project $project, User $user): Project
+    {
+        // Validate status transition (this will also validate project readiness)
+        $this->validateStatusTransition($project, ProjectStatus::ACTIVE, $user);
+
+        try {
+            return DB::transaction(function () use ($project, $user) {
+                $project->update(['status' => ProjectStatus::ACTIVE]);
+
+                $this->auditLogService::logAuthEvent(
+                    'project_resumed',
+                    $user,
+                    null,
+                    [
+                        'project_id' => $project->id,
+                        'project_name' => $project->name,
+                        'tenant_id' => $project->tenant_id,
+                        'previous_status' => $project->getOriginal('status'),
+                    ]
+                );
+
+                return $project->fresh();
+            });
+        } catch (\Exception $e) {
+            Log::error('Failed to resume project', [
+                'error' => $e->getMessage(),
+                'project_id' => $project->id,
+                'user_id' => $user->id,
+            ]);
+
+            throw new RuntimeException('Failed to resume project: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Validate status transition
+     */
+    public function validateStatusTransition(Project $project, ProjectStatus $newStatus, User $user): void
+    {
+        $currentStatus = $project->status;
+
+        // Use enum's transition validation
+        if (! $currentStatus->canTransitionTo($newStatus)) {
+            throw new InvalidArgumentException($currentStatus->transitionDescription($newStatus));
+        }
+
+        // Additional validation based on project state
+        if ($newStatus === ProjectStatus::ACTIVE) {
+            $this->validateProjectForActivation($project);
+        }
+
+        // Check if project has contributions for certain transitions
+        if (in_array($newStatus, [ProjectStatus::CANCELLED]) && $project->contributions()->exists()) {
+            // Allow cancellation but log it as a significant event
+            Log::warning('Project with contributions is being cancelled', [
+                'project_id' => $project->id,
+                'project_name' => $project->name,
+                'contributions_count' => $project->contributions()->count(),
+                'user_id' => $user->id,
+                'transition' => $currentStatus->transitionDescription($newStatus),
+            ]);
+        }
+
+        // Log the transition for audit purposes
+        Log::info('Project status transition validated', [
+            'project_id' => $project->id,
+            'project_name' => $project->name,
+            'from_status' => $currentStatus->value,
+            'to_status' => $newStatus->value,
+            'transition_description' => $currentStatus->transitionDescription($newStatus),
+            'user_id' => $user->id,
+        ]);
+    }
+
+    /**
      * Update project status automatically based on dates
      */
     public function updateProjectStatusByDate(): int
@@ -631,14 +751,65 @@ class ProjectService
                 ->get();
 
             foreach ($expiredProjects as $project) {
-                $project->update(['status' => ProjectStatus::COMPLETED]);
-                $updatedCount++;
+                try {
+                    $project->update(['status' => ProjectStatus::COMPLETED]);
+                    $updatedCount++;
 
-                Log::info('Project automatically completed due to end date', [
-                    'project_id' => $project->id,
-                    'project_name' => $project->name,
-                    'end_date' => $project->end_date,
-                ]);
+                    // Log the automatic completion
+                    Log::info('Project automatically completed', [
+                        'project_id' => $project->id,
+                        'project_name' => $project->name,
+                        'tenant_id' => $project->tenant_id,
+                        'end_date' => $project->end_date->toDateString(),
+                        'completion_reason' => 'end_date_reached',
+                    ]);
+
+                    Log::info('Project automatically completed due to end date', [
+                        'project_id' => $project->id,
+                        'project_name' => $project->name,
+                        'end_date' => $project->end_date,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Failed to auto-complete individual project', [
+                        'project_id' => $project->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            // Also handle projects that should be activated (if start date has arrived)
+            $projectsToActivate = Project::where('status', ProjectStatus::DRAFT)
+                ->where('start_date', '<=', now()->toDateString())
+                ->whereNotNull('start_date')
+                ->get();
+
+            foreach ($projectsToActivate as $project) {
+                try {
+                    // Only auto-activate if project is complete and ready
+                    if ($this->isProjectReadyForActivation($project)) {
+                        $project->update(['status' => ProjectStatus::ACTIVE]);
+                        $updatedCount++;
+
+                        Log::info('Project automatically activated', [
+                            'project_id' => $project->id,
+                            'project_name' => $project->name,
+                            'tenant_id' => $project->tenant_id,
+                            'start_date' => $project->start_date->toDateString(),
+                            'activation_reason' => 'start_date_reached',
+                        ]);
+
+                        Log::info('Project automatically activated due to start date', [
+                            'project_id' => $project->id,
+                            'project_name' => $project->name,
+                            'start_date' => $project->start_date,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Failed to auto-activate individual project', [
+                        'project_id' => $project->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
         } catch (\Exception $e) {
             Log::error('Failed to update project statuses by date', [
@@ -647,5 +818,24 @@ class ProjectService
         }
 
         return $updatedCount;
+    }
+
+    /**
+     * Check if project is ready for automatic activation
+     */
+    private function isProjectReadyForActivation(Project $project): bool
+    {
+        try {
+            $this->validateProjectForActivation($project);
+
+            return true;
+        } catch (InvalidArgumentException $e) {
+            Log::debug('Project not ready for auto-activation', [
+                'project_id' => $project->id,
+                'reason' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
     }
 }
