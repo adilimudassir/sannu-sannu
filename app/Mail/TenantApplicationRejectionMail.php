@@ -2,13 +2,13 @@
 
 namespace App\Mail;
 
-use App\Models\TenantApplication;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use App\Models\TenantApplication;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class TenantApplicationRejectionMail extends Mailable implements ShouldQueue
 {
@@ -43,6 +43,7 @@ class TenantApplicationRejectionMail extends Mailable implements ShouldQueue
                 'application' => $this->application,
                 'reapplyUrl' => route('tenant-application.create'),
                 'supportEmail' => config('mail.support_email', 'support@sannu-sannu.com'),
+                'notes' => $this->application->notes,
             ],
         );
     }

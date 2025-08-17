@@ -10,8 +10,16 @@ Thank you for your interest in joining the Sannu-Sannu platform. After careful r
 - **Organization:** {{ $application->organization_name }}
 - **Reviewed:** {{ $application->reviewed_at->format('F j, Y \a\t g:i A') }}
 
+
 ## Reason for Decision
 {{ $application->rejection_reason }}
+
+@if (!empty($notes))
+---
+### Additional Feedback
+{{ $notes }}
+---
+@endif
 
 ## Next Steps
 
