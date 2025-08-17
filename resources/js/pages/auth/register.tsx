@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
 
 import TextLink from '@/components/text-link';
@@ -5,6 +6,7 @@ import { AuthCard } from '@/components/auth/auth-card';
 import { AuthForm, AuthFormField } from '@/components/auth/auth-form';
 import { AuthInput } from '@/components/auth/auth-input';
 import { AuthButton } from '@/components/auth/auth-button';
+import { RegistrationTypeSelection } from '@/components/auth/registration-type-selection';
 
 type RegisterForm = {
     name: string;
@@ -13,20 +15,66 @@ type RegisterForm = {
     password_confirmation: string;
 };
 
+type RegistrationType = 'contributor' | 'organization' | null;
+
 export default function Register() {
+    const [registrationType, setRegistrationType] = useState<RegistrationType>(null);
+
+    const handleTypeSelection = (type: 'contributor' | 'organization') => {
+        if (type === 'organization') {
+            // Redirect to tenant application form
+            window.location.href = route('tenant-application.create');
+        } else {
+            setRegistrationType(type);
+        }
+    };
+
     const handleSubmit = (data: RegisterForm, form: any) => {
         form.post(route('register.store'), {
             onFinish: () => form.reset('password', 'password_confirmation'),
         });
     };
 
+    // Show type selection if no type is selected
+    if (registrationType === null) {
+        return (
+            <>
+                <Head title="Register" />
+                <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+                    <div className="max-w-4xl w-full">
+                        <RegistrationTypeSelection onSelectType={handleTypeSelection} />
+                        
+                        <div className="text-center mt-8">
+                            <p className="text-sm text-muted-foreground">
+                                Already have an account?{' '}
+                                <TextLink href={route('login')}>
+                                    Log in
+                                </TextLink>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    // Show contributor registration form
     return (
         <>
-            <Head title="Register" />
+            <Head title="Register as Contributor" />
             <AuthCard 
-                title="Create an account" 
-                description="Enter your details below to create your global account"
+                title="Create your contributor account" 
+                description="Enter your details below to join as a contributor"
             >
+                <div className="mb-6">
+                    <button
+                        onClick={() => setRegistrationType(null)}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        ← Back to registration options
+                    </button>
+                </div>
+
                 <AuthForm
                     initialData={{
                         name: '',
@@ -133,7 +181,7 @@ export default function Register() {
                                 loadingText="Creating account..."
                                 aria-describedby={form.hasErrors ? "form-errors" : undefined}
                             >
-                                Create account
+                                Create contributor account
                             </AuthButton>
 
                             {/* General form errors */}

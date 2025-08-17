@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
 
 class AuditLogService
 {
@@ -35,7 +35,7 @@ class AuditLogService
         $logData = array_merge($logData, $additionalData);
 
         // Remove null values
-        $logData = array_filter($logData, fn($value) => $value !== null);
+        $logData = array_filter($logData, fn ($value) => $value !== null);
 
         // Log based on event type
         match ($event) {
@@ -92,7 +92,7 @@ class AuditLogService
         $logData = array_merge($logData, $additionalData);
 
         // Remove null values
-        $logData = array_filter($logData, fn($value) => $value !== null);
+        $logData = array_filter($logData, fn ($value) => $value !== null);
 
         // Log based on severity
         match ($severity) {
@@ -119,7 +119,7 @@ class AuditLogService
             $request,
             array_merge($additionalData, [
                 'action' => $action,
-                'rate_limit_key' => $request?->ip() . '|' . $action,
+                'rate_limit_key' => $request?->ip().'|'.$action,
             ])
         );
     }
@@ -243,7 +243,7 @@ class AuditLogService
             'timestamp' => now()->toISOString(),
             'ip_address' => request()?->ip(),
             'user_agent' => request()?->userAgent(),
-            'session_id' => request()?->session()?->getId(),
+            'session_id' => request()?->hasSession() ? request()->session()->getId() : null,
         ];
 
         if ($user) {
@@ -261,7 +261,7 @@ class AuditLogService
         $logData = array_merge($logData, $additionalData);
 
         // Remove null values
-        $logData = array_filter($logData, fn($value) => $value !== null);
+        $logData = array_filter($logData, fn ($value) => $value !== null);
 
         // Log the audit event
         Log::info("Audit: {$action}", $logData);

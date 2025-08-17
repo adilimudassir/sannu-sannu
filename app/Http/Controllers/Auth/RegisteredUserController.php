@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Enums\Role;
-use App\Models\User;
-use Inertia\Inertia;
-use Inertia\Response;
-use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Models\User;
 use App\Services\AuditLogService;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Auth\Events\Registered;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
@@ -32,6 +32,11 @@ class RegisteredUserController extends Controller
     public function store(RegisterRequest $request): RedirectResponse
     {
         $validated = $request->validated();
+
+        // Check if this is an organization registration redirect
+        if ($request->has('registration_type') && $request->input('registration_type') === 'organization') {
+            return redirect()->route('tenant-application.create');
+        }
 
         // Create global user with contributor role by default
         $user = User::create([

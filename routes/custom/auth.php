@@ -32,6 +32,18 @@ Route::middleware('guest')->group(function () {
     Route::post('register', [RegisteredUserController::class, 'store'])
         ->middleware('throttle:3,1')
         ->name('register.store');
+
+    // Tenant application routes
+    Route::get('tenant-application', [\App\Http\Controllers\Auth\TenantRegistrationController::class, 'create'])
+        ->name('tenant-application.create');
+    Route::post('tenant-application', [\App\Http\Controllers\Auth\TenantRegistrationController::class, 'store'])
+        ->middleware('throttle:3,1')
+        ->name('tenant-application.store');
+    Route::get('tenant-application/{referenceNumber}/status', [\App\Http\Controllers\Auth\TenantRegistrationController::class, 'showStatus'])
+        ->name('tenant-application.status');
+    Route::get('api/tenant-application/{referenceNumber}/status', [\App\Http\Controllers\Auth\TenantRegistrationController::class, 'getStatusApi'])
+        ->name('tenant-application.status.api');
+
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
