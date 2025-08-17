@@ -23,8 +23,8 @@ export default function TenantApplication({ industryTypes }: TenantApplicationPa
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full">
+    <div className="min-h-screen flex items-center justify-center py-5 px-4 sm:px-6 lg:px-8">
+      <div className="w-full">
         <TenantApplicationForm
           onSubmit={handleSubmit}
           onBack={handleBack}

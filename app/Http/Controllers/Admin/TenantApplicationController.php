@@ -36,9 +36,16 @@ class TenantApplicationController extends Controller
 
         return Inertia::render('admin/tenant-applications/index', [
             'applications' => $applications,
-            'filters' => $request->only(['status', 'search', 'sort', 'direction'])
+            'filters' => array_merge([
+                    'search' => '',
+                    'status' => '',
+                    'sort' => 'submitted_at',
+                    'direction' => 'desc',
+                ], $request->only(['status', 'search', 'sort', 'direction']))
         ]);
     }
+
+    
     public function show(TenantApplication $tenantApplication)
     {
         return Inertia::render('admin/tenant-applications/show', [

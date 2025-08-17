@@ -1,13 +1,49 @@
-import React from 'react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { ArrowLeft, Building2, Calendar, CheckCircle2, Clock, FileCheck, Mail, Phone, User, Globe, XCircle } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { Head, usePage, router } from '@inertiajs/react';
+import { formatDate } from '@/lib/formatters';
+
+interface TenantApplication {
+    id: number;
+    reference_number: string;
+    organization_name: string;
+    contact_person_name: string;
+    contact_person_email: string;
+    contact_person_phone?: string;
+    business_registration_number: string;
+    industry_type: string;
+    website_url?: string;
+    status: 'pending' | 'approved' | 'rejected';
+    submitted_at: string;
+    reviewed_at?: string;
+    reviewer?: string;
+    rejection_reason?: string;
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+}
+
+interface PageProps {
+    [key: string]: any;
+    application: TenantApplication;
+}
 
 export default function TenantApplicationShow() {
-    const { application } = usePage().props as any;
+    const { application } = usePage<PageProps>().props;
 
-    const [notes, setNotes] = React.useState('');
-    const [rejectionReason, setRejectionReason] = React.useState('');
-    const [submitting, setSubmitting] = React.useState(false);
+    const [notes, setNotes] = useState('');
+    const [rejectionReason, setRejectionReason] = useState('');
+    const [submitting, setSubmitting] = useState(false);
     const { status } = application;
     const canReview = status === 'pending';
 
@@ -27,106 +63,224 @@ export default function TenantApplicationShow() {
         });
     };
 
+    const statusConfig: Record<TenantApplication['status'], {
+        label: string;
+        icon: React.ElementType;
+        color: string;
+    }> = {
+        pending: { label: 'Pending', icon: Clock, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-400' },
+        approved: { label: 'Approved', icon: CheckCircle2, color: 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400' },
+        rejected: { label: 'Rejected', icon: XCircle, color: 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400' },
+    };
+
     return (
         <AppLayout>
             <Head title={`Review Application: ${application.organization_name}`} />
             <div className="space-y-6">
-                <h1 className="text-2xl font-bold">Review Tenant Application</h1>
-                <div className="bg-card p-6 rounded shadow">
-                    <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <dt className="font-semibold">Organization Name</dt>
-                            <dd>{application.organization_name}</dd>
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="icon" asChild>
+                                <Link href={route('admin.tenant-applications.index')}>
+                                    <ArrowLeft className="h-4 w-4" />
+                                </Link>
+                            </Button>
+                            <h1 className="text-3xl font-bold tracking-tight">Review Tenant Application</h1>
                         </div>
-                        <div>
-                            <dt className="font-semibold">Reference Number</dt>
-                            <dd>{application.reference_number}</dd>
-                        </div>
-                        <div>
-                            <dt className="font-semibold">Contact Person</dt>
-                            <dd>{application.contact_person_name} ({application.contact_person_email})</dd>
-                        </div>
-                        <div>
-                            <dt className="font-semibold">Phone</dt>
-                            <dd>{application.contact_person_phone}</dd>
-                        </div>
-                        <div>
-                            <dt className="font-semibold">Business Registration #</dt>
-                            <dd>{application.business_registration_number}</dd>
-                        </div>
-                        <div>
-                            <dt className="font-semibold">Industry</dt>
-                            <dd>{application.industry_type}</dd>
-                        </div>
-                        <div>
-                            <dt className="font-semibold">Website</dt>
-                            <dd>{application.website_url}</dd>
-                        </div>
-                        <div>
-                            <dt className="font-semibold">Status</dt>
-                            <dd>{application.status}</dd>
-                        </div>
-                        <div>
-                            <dt className="font-semibold">Submitted At</dt>
-                            <dd>{application.submitted_at}</dd>
-                        </div>
-                        {application.reviewed_at && (
-                            <div>
-                                <dt className="font-semibold">Reviewed At</dt>
-                                <dd>{application.reviewed_at}</dd>
-                            </div>
-                        )}
-                        {application.reviewer_id && (
-                            <div>
-                                <dt className="font-semibold">Reviewed By</dt>
-                                <dd>{application.reviewer_id}</dd>
-                            </div>
-                        )}
-                        {application.rejection_reason && (
-                            <div>
-                                <dt className="font-semibold">Rejection Reason</dt>
-                                <dd>{application.rejection_reason}</dd>
-                            </div>
-                        )}
-                        {application.notes && (
-                            <div className="md:col-span-2">
-                                <dt className="font-semibold">Notes</dt>
-                                <dd>{application.notes}</dd>
-                            </div>
-                        )}
-                    </dl>
+                        <p className="text-muted-foreground">Review and manage tenant application details</p>
+                    </div>
                 </div>
 
+                {/* Application Overview */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Application Details</CardTitle>
+                        <CardDescription>
+                            Reference Number: <code className="font-mono">{application.reference_number}</code>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        {/* Organization Information */}
+                        <div className="space-y-2">
+                            <h3 className="font-semibold">Organization Information</h3>
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                                        <div className="font-medium">{application.organization_name}</div>
+                                    </div>
+                                    <div className="text-sm text-muted-foreground pl-6">
+                                        Industry: {application.industry_type}
+                                    </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <FileCheck className="h-4 w-4 text-muted-foreground" />
+                                        <span className="font-mono text-sm">{application.business_registration_number}</span>
+                                    </div>
+                                    {application.website_url && (
+                                        <div className="flex items-center gap-2 pl-6">
+                                            <Globe className="h-3 w-3 text-muted-foreground" />
+                                            <a href={application.website_url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                                                {application.website_url}
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <Separator />
+
+                        {/* Contact Information */}
+                        <div className="space-y-2">
+                            <h3 className="font-semibold">Contact Information</h3>
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <User className="h-4 w-4 text-muted-foreground" />
+                                        <div className="font-medium">{application.contact_person_name}</div>
+                                    </div>
+                                    <div className="flex items-center gap-2 pl-6 text-sm text-muted-foreground">
+                                        <Mail className="h-3 w-3" />
+                                        <span>{application.contact_person_email}</span>
+                                    </div>
+                                </div>
+                                {application.contact_person_phone && (
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2">
+                                            <Phone className="h-4 w-4 text-muted-foreground" />
+                                            <div>{application.contact_person_phone}</div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <Separator />
+
+                        {/* Status Information */}
+                        <div className="space-y-2">
+                            <h3 className="font-semibold">Application Status</h3>
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <Badge className={statusConfig[application.status].color}>
+                                            {React.createElement(statusConfig[application.status].icon, { className: 'mr-1 h-3 w-3' })}
+                                            {statusConfig[application.status].label}
+                                        </Badge>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <Calendar className="h-3 w-3" />
+                                        <span>Submitted {formatDate(application.submitted_at)}</span>
+                                    </div>
+                                </div>
+                                {application.reviewed_at && (
+                                    <div className="space-y-1">
+                                        <div className="text-sm text-muted-foreground">
+                                            Reviewed {formatDate(application.reviewed_at)}
+                                            {application.reviewer && ` by ${application.reviewer}`}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {application.rejection_reason && (
+                                <Alert variant="destructive" className="mt-4">
+                                    <XCircle className="h-4 w-4" />
+                                    <AlertTitle>Application Rejected</AlertTitle>
+                                    <AlertDescription>{application.rejection_reason}</AlertDescription>
+                                </Alert>
+                            )}
+
+                            {application.notes && (
+                                <div className="mt-4 rounded-lg border p-4">
+                                    <h4 className="font-medium mb-2">Review Notes</h4>
+                                    <p className="text-sm text-muted-foreground">{application.notes}</p>
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Review Actions */}
                 {canReview && (
-                    <div className="mt-8 flex flex-col md:flex-row gap-6">
-                        <form onSubmit={handleApprove} className="flex-1 bg-green-50 p-4 rounded shadow space-y-2">
-                            <h2 className="font-semibold text-green-700">Approve Application</h2>
-                            <label className="block">
-                                <span className="text-sm">Notes (optional)</span>
-                                <textarea className="input input-bordered w-full" value={notes} onChange={e => setNotes(e.target.value)} />
-                            </label>
-                            <button type="submit" className="btn btn-success" disabled={submitting}>Approve</button>
-                        </form>
-                        <form onSubmit={handleReject} className="flex-1 bg-red-50 p-4 rounded shadow space-y-2">
-                            <h2 className="font-semibold text-red-700">Reject Application</h2>
-                            <label className="block">
-                                <span className="text-sm">Rejection Reason</span>
-                                <input className="input input-bordered w-full" value={rejectionReason} onChange={e => setRejectionReason(e.target.value)} required />
-                            </label>
-                            <label className="block">
-                                <span className="text-sm">Notes (optional)</span>
-                                <textarea className="input input-bordered w-full" value={notes} onChange={e => setNotes(e.target.value)} />
-                            </label>
-                            <button type="submit" className="btn btn-danger" disabled={submitting}>Reject</button>
-                        </form>
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <Card>
+                            <form onSubmit={handleApprove}>
+                                <CardHeader>
+                                    <CardTitle className="text-green-700 dark:text-green-400">Approve Application</CardTitle>
+                                    <CardDescription>Grant tenant access to the platform</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="approve-notes">Notes (optional)</Label>
+                                        <Textarea
+                                            id="approve-notes"
+                                            placeholder="Add any notes about this approval..."
+                                            value={notes}
+                                            onChange={e => setNotes(e.target.value)}
+                                        />
+                                    </div>
+                                    <Button type="submit" className="w-full" disabled={submitting}>
+                                        <CheckCircle2 className="mr-2 h-4 w-4" />
+                                        Approve Application
+                                    </Button>
+                                </CardContent>
+                            </form>
+                        </Card>
+
+                        <Card>
+                            <form onSubmit={handleReject}>
+                                <CardHeader>
+                                    <CardTitle className="text-red-700 dark:text-red-400">Reject Application</CardTitle>
+                                    <CardDescription>Decline tenant access to the platform</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="rejection-reason">Rejection Reason</Label>
+                                        <Input
+                                            id="rejection-reason"
+                                            placeholder="Provide a reason for rejection..."
+                                            value={rejectionReason}
+                                            onChange={e => setRejectionReason(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="reject-notes">Additional Notes (optional)</Label>
+                                        <Textarea
+                                            id="reject-notes"
+                                            placeholder="Add any additional notes..."
+                                            value={notes}
+                                            onChange={e => setNotes(e.target.value)}
+                                        />
+                                    </div>
+                                    <Button type="submit" variant="destructive" className="w-full" disabled={submitting}>
+                                        <XCircle className="mr-2 h-4 w-4" />
+                                        Reject Application
+                                    </Button>
+                                </CardContent>
+                            </form>
+                        </Card>
                     </div>
                 )}
 
                 {status === 'approved' && (
-                    <div className="mt-8 p-4 bg-green-100 rounded text-green-800 font-semibold">This application has been approved.</div>
+                    <Alert className="bg-green-100 dark:bg-green-800/20 text-green-800 dark:text-green-400 border-green-200 dark:border-green-800">
+                        <CheckCircle2 className="h-4 w-4" />
+                        <AlertTitle>Application Approved</AlertTitle>
+                        <AlertDescription>This tenant application has been approved and can now access the platform.</AlertDescription>
+                    </Alert>
                 )}
+
                 {status === 'rejected' && (
-                    <div className="mt-8 p-4 bg-red-100 rounded text-red-800 font-semibold">This application has been rejected.</div>
+                    <Alert variant="destructive">
+                        <XCircle className="h-4 w-4" />
+                        <AlertTitle>Application Rejected</AlertTitle>
+                        <AlertDescription>This tenant application has been rejected.</AlertDescription>
+                    </Alert>
                 )}
             </div>
         </AppLayout>

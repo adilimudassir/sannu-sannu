@@ -44,7 +44,7 @@ export const TenantApplicationForm: React.FC<TenantApplicationFormProps> = ({
       <AuthCard 
         title="Register Your Organization" 
         description="Tell us about your organization to get started with creating contribution-based projects"
-        className="max-w-2xl"
+        size="2xl"
       >
         <div className="mb-6">
           <Button
@@ -54,7 +54,7 @@ export const TenantApplicationForm: React.FC<TenantApplicationFormProps> = ({
             className="p-0 h-auto font-normal text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to registration options
+            Back
           </Button>
         </div>
 
@@ -74,122 +74,131 @@ export const TenantApplicationForm: React.FC<TenantApplicationFormProps> = ({
         >
           {(form) => (
             <>
-              <div className="space-y-6">
+              <div className="grid gap-8">
                 {/* Organization Information */}
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div className="border-b pb-2">
                     <h3 className="text-sm font-medium text-foreground">Organization Information</h3>
                     <p className="text-xs text-muted-foreground">Basic details about your organization</p>
                   </div>
 
-                  <AuthFormField
-                    label="Organization Name"
-                    name="organization_name"
-                    error={form.errors.organization_name}
-                    required
-                  >
-                    <AuthInput
-                      id="organization_name"
+                  {/* Organization Name and Industry - Side by Side */}
+                  <div className="grid gap-6 md:grid-cols-2">
+                    <AuthFormField
+                      label="Organization Name"
                       name="organization_name"
-                      type="text"
+                      error={form.errors.organization_name}
                       required
-                      autoFocus
-                      tabIndex={1}
-                      value={form.data.organization_name}
-                      onChange={(e) => form.setData('organization_name', e.target.value)}
-                      placeholder="Your Organization Name"
-                      error={!!form.errors.organization_name}
-                      aria-describedby={form.errors.organization_name ? "organization-name-error" : undefined}
-                    />
-                  </AuthFormField>
-
-                  <AuthFormField
-                    label="Business Description"
-                    name="business_description"
-                    error={form.errors.business_description}
-                    required
-                  >
-                    <Textarea
-                      id="business_description"
-                      name="business_description"
-                      required
-                      tabIndex={2}
-                      value={form.data.business_description}
-                      onChange={(e) => form.setData('business_description', e.target.value)}
-                      placeholder="Describe your business, what you do, and what types of projects you plan to create..."
-                      className="min-h-[100px] resize-none"
-                      maxLength={1000}
-                    />
-                    <div className={`text-xs mt-1 ${
-                      form.data.business_description.length < 50 
-                        ? 'text-destructive' 
-                        : form.data.business_description.length > 900 
-                          ? 'text-warning' 
-                          : 'text-muted-foreground'
-                    }`}>
-                      {form.data.business_description.length}/1000 characters 
-                      {form.data.business_description.length < 50 && (
-                        <span className="ml-1">(minimum 50 required)</span>
-                      )}
-                    </div>
-                  </AuthFormField>
-
-                  <AuthFormField
-                    label="Industry Type"
-                    name="industry_type"
-                    error={form.errors.industry_type}
-                    required
-                  >
-                    <Select
-                      value={form.data.industry_type}
-                      onValueChange={(value) => form.setData('industry_type', value)}
                     >
-                      <SelectTrigger tabIndex={3}>
-                        <SelectValue placeholder="Select your industry" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(industryTypes).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </AuthFormField>
+                      <AuthInput
+                        id="organization_name"
+                        name="organization_name"
+                        type="text"
+                        required
+                        autoFocus
+                        tabIndex={1}
+                        value={form.data.organization_name}
+                        onChange={(e) => form.setData('organization_name', e.target.value)}
+                        placeholder="Your Organization Name"
+                        error={!!form.errors.organization_name}
+                        aria-describedby={form.errors.organization_name ? "organization-name-error" : undefined}
+                      />
+                    </AuthFormField>
 
-                  <AuthFormField
-                    label="Business Registration Number"
-                    name="business_registration_number"
-                    error={form.errors.business_registration_number}
-                  >
-                    <AuthInput
-                      id="business_registration_number"
+                    <AuthFormField
+                      label="Industry Type"
+                      name="industry_type"
+                      error={form.errors.industry_type}
+                      required
+                    >
+                      <Select
+                        value={form.data.industry_type}
+                        onValueChange={(value) => form.setData('industry_type', value)}
+                      >
+                        <SelectTrigger tabIndex={2}>
+                          <SelectValue placeholder="Select your industry" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(industryTypes).map(([value, label]) => (
+                            <SelectItem key={value} value={value}>
+                              {label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </AuthFormField>
+                  </div>
+
+                  {/* Business Description - Full Width */}
+                  <div className="w-full">
+                    <AuthFormField
+                      label="Business Description"
+                      name="business_description"
+                      error={form.errors.business_description}
+                      required
+                    >
+                      <Textarea
+                        id="business_description"
+                        name="business_description"
+                        required
+                        tabIndex={3}
+                        value={form.data.business_description}
+                        onChange={(e) => form.setData('business_description', e.target.value)}
+                        placeholder="Describe your business, what you do, and what types of projects you plan to create..."
+                        className="min-h-[150px] resize-none"
+                        maxLength={1000}
+                      />
+                      <div className={`text-xs mt-1 ${
+                        form.data.business_description.length < 50 
+                          ? 'text-destructive' 
+                          : form.data.business_description.length > 900 
+                            ? 'text-warning' 
+                            : 'text-muted-foreground'
+                      }`}>
+                        {form.data.business_description.length}/1000 characters 
+                        {form.data.business_description.length < 50 && (
+                          <span className="ml-1">(minimum 50 required)</span>
+                        )}
+                      </div>
+                    </AuthFormField>
+                  </div>
+
+                  {/* Additional Business Details - Side by Side */}
+                  <div className="grid gap-6 md:grid-cols-2">
+                    <AuthFormField
+                      label="Business Registration Number"
                       name="business_registration_number"
-                      type="text"
-                      tabIndex={4}
-                      value={form.data.business_registration_number}
-                      onChange={(e) => form.setData('business_registration_number', e.target.value)}
-                      placeholder="Optional - Your business registration number"
-                      error={!!form.errors.business_registration_number}
-                    />
-                  </AuthFormField>
+                      error={form.errors.business_registration_number}
+                    >
+                      <AuthInput
+                        id="business_registration_number"
+                        name="business_registration_number"
+                        type="text"
+                        tabIndex={4}
+                        value={form.data.business_registration_number}
+                        onChange={(e) => form.setData('business_registration_number', e.target.value)}
+                        placeholder="Optional - Registration number"
+                        error={!!form.errors.business_registration_number}
+                      />
+                    </AuthFormField>
 
-                  <AuthFormField
-                    label="Website URL"
-                    name="website_url"
-                    error={form.errors.website_url}
-                  >
-                    <AuthInput
-                      id="website_url"
+                    <AuthFormField
+                      label="Website URL"
                       name="website_url"
-                      type="url"
-                      tabIndex={5}
-                      value={form.data.website_url}
-                      onChange={(e) => form.setData('website_url', e.target.value)}
-                      placeholder="https://your-website.com"
-                      error={!!form.errors.website_url}
-                    />
-                  </AuthFormField>
+                      error={form.errors.website_url}
+                    >
+                      <AuthInput
+                        id="website_url"
+                        name="website_url"
+                        type="url"
+                        tabIndex={5}
+                        value={form.data.website_url}
+                        onChange={(e) => form.setData('website_url', e.target.value)}
+                        placeholder="https://your-website.com"
+                        error={!!form.errors.website_url}
+                      />
+                    </AuthFormField>
+                  </div>
                 </div>
 
                 {/* Contact Information */}
@@ -199,63 +208,68 @@ export const TenantApplicationForm: React.FC<TenantApplicationFormProps> = ({
                     <p className="text-xs text-muted-foreground">Details for the main contact person</p>
                   </div>
 
-                  <AuthFormField
-                    label="Contact Person Name"
-                    name="contact_person_name"
-                    error={form.errors.contact_person_name}
-                    required
-                  >
-                    <AuthInput
-                      id="contact_person_name"
+                  <div className="grid gap-6 lg:grid-cols-3">
+                    {/* Column 1: Contact Name */}
+                    <AuthFormField
+                      label="Contact Person Name"
                       name="contact_person_name"
-                      type="text"
+                      error={form.errors.contact_person_name}
                       required
-                      tabIndex={6}
-                      autoComplete="name"
-                      value={form.data.contact_person_name}
-                      onChange={(e) => form.setData('contact_person_name', e.target.value)}
-                      placeholder="Full name of primary contact"
-                      error={!!form.errors.contact_person_name}
-                    />
-                  </AuthFormField>
+                    >
+                      <AuthInput
+                        id="contact_person_name"
+                        name="contact_person_name"
+                        type="text"
+                        required
+                        tabIndex={6}
+                        autoComplete="name"
+                        value={form.data.contact_person_name}
+                        onChange={(e) => form.setData('contact_person_name', e.target.value)}
+                        placeholder="Full name of primary contact"
+                        error={!!form.errors.contact_person_name}
+                      />
+                    </AuthFormField>
 
-                  <AuthFormField
-                    label="Contact Email Address"
-                    name="contact_person_email"
-                    error={form.errors.contact_person_email}
-                    required
-                  >
-                    <AuthInput
-                      id="contact_person_email"
+                    {/* Column 2: Contact Email */}
+                    <AuthFormField
+                      label="Contact Email Address"
                       name="contact_person_email"
-                      type="email"
+                      error={form.errors.contact_person_email}
                       required
-                      tabIndex={7}
-                      autoComplete="email"
-                      value={form.data.contact_person_email}
-                      onChange={(e) => form.setData('contact_person_email', e.target.value)}
-                      placeholder="contact@organization.com"
-                      error={!!form.errors.contact_person_email}
-                    />
-                  </AuthFormField>
+                    >
+                      <AuthInput
+                        id="contact_person_email"
+                        name="contact_person_email"
+                        type="email"
+                        required
+                        tabIndex={7}
+                        autoComplete="email"
+                        value={form.data.contact_person_email}
+                        onChange={(e) => form.setData('contact_person_email', e.target.value)}
+                        placeholder="contact@organization.com"
+                        error={!!form.errors.contact_person_email}
+                      />
+                    </AuthFormField>
 
-                  <AuthFormField
-                    label="Contact Phone Number"
-                    name="contact_person_phone"
-                    error={form.errors.contact_person_phone}
-                  >
-                    <AuthInput
-                      id="contact_person_phone"
+                    {/* Column 3: Contact Phone */}
+                    <AuthFormField
+                      label="Contact Phone Number"
                       name="contact_person_phone"
-                      type="tel"
-                      tabIndex={8}
-                      autoComplete="tel"
-                      value={form.data.contact_person_phone}
-                      onChange={(e) => form.setData('contact_person_phone', e.target.value)}
-                      placeholder="Optional - Phone number"
-                      error={!!form.errors.contact_person_phone}
-                    />
-                  </AuthFormField>
+                      error={form.errors.contact_person_phone}
+                    >
+                      <AuthInput
+                        id="contact_person_phone"
+                        name="contact_person_phone"
+                        type="tel"
+                        tabIndex={8}
+                        autoComplete="tel"
+                        value={form.data.contact_person_phone}
+                        onChange={(e) => form.setData('contact_person_phone', e.target.value)}
+                        placeholder="Optional - Phone number"
+                        error={!!form.errors.contact_person_phone}
+                      />
+                    </AuthFormField>
+                  </div>
                 </div>
               </div>
 
