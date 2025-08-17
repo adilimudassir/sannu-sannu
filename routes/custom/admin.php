@@ -21,6 +21,17 @@ Route::middleware(['can:manage-platform', 'auth'])
         Route::get('/dashboard', fn () => Inertia::render('admin/dashboard'))
             ->name('dashboard');
 
+        Route::get('tenant-applications', [\App\Http\Controllers\Admin\TenantApplicationController::class, 'index'])
+            ->name('tenant-applications.index');
+
+        Route::get('tenant-applications/{tenantApplication}', [\App\Http\Controllers\Admin\TenantApplicationController::class, 'show'])
+            ->name('tenant-applications.show');
+
+        Route::patch('tenant-applications/{tenantApplication}/approve', [\App\Http\Controllers\Admin\TenantApplicationController::class, 'approve'])
+            ->name('tenant-applications.approve');
+        Route::patch('tenant-applications/{tenantApplication}/reject', [\App\Http\Controllers\Admin\TenantApplicationController::class, 'reject'])
+            ->name('tenant-applications.reject');
+
         Route::get('tenants', fn () => Inertia::render('admin/tenants'))
             ->name('tenants');
 

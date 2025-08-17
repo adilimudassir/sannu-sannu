@@ -53,18 +53,19 @@ class TenantApplicationService
     /**
      * Approve a tenant application and create the tenant.
      */
-    public function approveApplication(TenantApplication $application, User $approver): Tenant
+    public function approveApplication(TenantApplication $application, User $approver, ?string $notes = null): Tenant
     {
         if (! $application->canBeReviewed()) {
             throw new \InvalidArgumentException('Application cannot be reviewed in its current state.');
         }
 
-        return DB::transaction(function () use ($application, $approver) {
+        return DB::transaction(function () use ($application, $approver, $notes) {
             // Update application status
             $application->update([
                 'status' => TenantApplicationStatus::APPROVED,
                 'reviewed_at' => now(),
                 'reviewer_id' => $approver->id,
+                'notes' => $notes,
             ]);
 
             // Create tenant
@@ -120,18 +121,19 @@ class TenantApplicationService
     /**
      * Reject a tenant application.
      */
-    public function rejectApplication(TenantApplication $application, string $reason, User $rejector): void
+    public function rejectApplication(TenantApplication $application, string $reason, User $rejector, ?string $notes = null): void
     {
         if (! $application->canBeReviewed()) {
             throw new \InvalidArgumentException('Application cannot be reviewed in its current state.');
         }
 
-        DB::transaction(function () use ($application, $reason, $rejector) {
+        DB::transaction(function () use ($application, $reason, $rejector, $notes) {
             $application->update([
                 'status' => TenantApplicationStatus::REJECTED,
                 'reviewed_at' => now(),
                 'reviewer_id' => $rejector->id,
                 'rejection_reason' => $reason,
+                'notes' => $notes,
             ]);
 
             // Send rejection email
@@ -142,7 +144,7 @@ class TenantApplicationService
                 'tenant_application_rejected',
                 $application,
                 $rejector,
-                ['reason' => $reason]
+                ['reason' => $reason, 'notes' => $notes]
             );
         });
     }

@@ -44,6 +44,7 @@ export const TenantApplicationForm: React.FC<TenantApplicationFormProps> = ({
       <AuthCard 
         title="Register Your Organization" 
         description="Tell us about your organization to get started with creating contribution-based projects"
+        className="max-w-2xl"
       >
         <div className="mb-6">
           <Button

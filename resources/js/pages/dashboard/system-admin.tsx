@@ -67,6 +67,12 @@ export default function SystemAdminDashboard({
                     </div>
                     <div className="flex gap-2">
                         <Button asChild>
+                            <Link href="/admin/tenant-applications">
+                                <Eye className="mr-2 h-4 w-4" />
+                                Pending Applications
+                            </Link>
+                        </Button>
+                        <Button asChild>
                             <Link href="/admin/tenants/create">
                                 <Plus className="mr-2 h-4 w-4" />
                                 New Tenant
